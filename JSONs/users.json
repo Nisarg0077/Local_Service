@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "u1",
+    "name": "Rahul Verma",
+    "email": "rahul@demo.com",
+    "password": "Demo@123",
+    "role": "customer",
+    "phone": "9876543210",
+    "avatar": "https://i.pravatar.cc/150?u=u1",
+    "address": "12A, Lajpat Nagar, New Delhi",
+    "joinedAt": "2023-06-10T00:00:00Z",
+    "favorites": [101, 103, 105]
+  },
+  {
+    "_id": "u2",
+    "name": "Priya Shah",
+    "email": "priya@demo.com",
+    "password": "Demo@123",
+    "role": "customer",
+    "phone": "9988776655",
+    "avatar": "https://i.pravatar.cc/150?u=u2",
+    "address": "45, Andheri West, Mumbai",
+    "joinedAt": "2023-09-22T00:00:00Z",
+    "favorites": [102]
+  },
+  {
+    "_id": "u3",
+    "name": "Admin User",
+    "email": "admin@demo.com",
+    "password": "Admin@123",
+    "role": "admin",
+    "phone": "9000000001",
+    "avatar": "https://i.pravatar.cc/150?u=u3",
+    "address": "HQ, Bangalore",
+    "joinedAt": "2022-01-01T00:00:00Z",
+    "favorites": []
+  }
+]

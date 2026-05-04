@@ -1,0 +1,42 @@
+[
+  {
+    "_id": "n1",
+    "userId": "u1",
+    "type": "booking",
+    "title": "Booking Confirmed!",
+    "message": "Your booking for Home Wiring has been confirmed by Aryan Sharma.",
+    "read": false,
+    "createdAt": "2024-05-10T10:00:00Z",
+    "icon": "✅"
+  },
+  {
+    "_id": "n2",
+    "userId": "u1",
+    "type": "reminder",
+    "title": "Service Reminder",
+    "message": "Your Sofa Cleaning is scheduled for tomorrow at 9:00 AM.",
+    "read": false,
+    "createdAt": "2024-04-19T08:00:00Z",
+    "icon": "🔔"
+  },
+  {
+    "_id": "n3",
+    "userId": "u1",
+    "type": "promo",
+    "title": "20% Off This Weekend!",
+    "message": "Book any cleaning service this weekend and get 20% off.",
+    "read": true,
+    "createdAt": "2024-04-18T12:00:00Z",
+    "icon": "🎁"
+  },
+  {
+    "_id": "n4",
+    "userId": "u1",
+    "type": "booking",
+    "title": "Payment Successful",
+    "message": "Payment of ₹450 received for Pipe Leakage Fix. Invoice sent to email.",
+    "read": true,
+    "createdAt": "2024-04-12T14:30:00Z",
+    "icon": "💳"
+  }
+]

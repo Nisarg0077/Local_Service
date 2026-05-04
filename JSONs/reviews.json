@@ -1,0 +1,52 @@
+[
+  {
+    "_id": "r1",
+    "serviceId": 101,
+    "userId": "u1",
+    "userName": "Rahul V.",
+    "avatar": "https://i.pravatar.cc/150?u=u1",
+    "rating": 5,
+    "comment": "Excellent work! Aryan was punctual and very professional. Fixed all wiring issues in under 2 hours.",
+    "date": "2024-03-10T00:00:00Z"
+  },
+  {
+    "_id": "r2",
+    "serviceId": 101,
+    "userId": "u2",
+    "userName": "Priya S.",
+    "avatar": "https://i.pravatar.cc/150?u=u2",
+    "rating": 4,
+    "comment": "Good service, came well-prepared. Fixed the MCB box issue. Minor delay but overall excellent.",
+    "date": "2024-04-05T00:00:00Z"
+  },
+  {
+    "_id": "r3",
+    "serviceId": 103,
+    "userId": "u1",
+    "userName": "Rahul V.",
+    "avatar": "https://i.pravatar.cc/150?u=u1",
+    "rating": 5,
+    "comment": "The sofa looks brand new! Neha and team were very thorough. Will definitely rebook.",
+    "date": "2024-02-20T00:00:00Z"
+  },
+  {
+    "_id": "r4",
+    "serviceId": 103,
+    "userId": "u2",
+    "userName": "Priya S.",
+    "avatar": "https://i.pravatar.cc/150?u=u2",
+    "rating": 5,
+    "comment": "Amazing deep cleaning service. Used eco-friendly products that were safe for my kids.",
+    "date": "2024-04-10T00:00:00Z"
+  },
+  {
+    "_id": "r5",
+    "serviceId": 104,
+    "userId": "u1",
+    "userName": "Rahul V.",
+    "avatar": "https://i.pravatar.cc/150?u=u1",
+    "rating": 4,
+    "comment": "AC is working perfectly after service. Good value for money.",
+    "date": "2024-01-15T00:00:00Z"
+  }
+]

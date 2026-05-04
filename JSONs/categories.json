@@ -1,0 +1,10 @@
+[
+  { "name": "Electrician" },
+  { "name": "Plumber" },
+  { "name": "AC Repair" },
+  { "name": "Cleaning" },
+  { "name": "Painting" },
+  { "name": "Carpentry" },
+  { "name": "Pest Control" },
+  { "name": "Appliances" }
+]

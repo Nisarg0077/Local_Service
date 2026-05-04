@@ -1,0 +1,67 @@
+[
+  {
+    "_id": "B-1001",
+    "customerId": "u1",
+    "providerId": "p1",
+    "serviceId": 101,
+    "date": "2024-05-15",
+    "time": "10:00 AM",
+    "status": "Pending",
+    "amount": 1500,
+    "address": "12A, Lajpat Nagar, New Delhi",
+    "note": "Please bring all tools.",
+    "createdAt": "2024-05-10T09:00:00Z"
+  },
+  {
+    "_id": "B-1002",
+    "customerId": "u1",
+    "providerId": "p2",
+    "serviceId": 102,
+    "date": "2024-04-12",
+    "time": "02:00 PM",
+    "status": "Completed",
+    "amount": 450,
+    "address": "12A, Lajpat Nagar, New Delhi",
+    "note": "",
+    "createdAt": "2024-04-08T14:00:00Z"
+  },
+  {
+    "_id": "B-1003",
+    "customerId": "u1",
+    "providerId": "p3",
+    "serviceId": 103,
+    "date": "2024-04-20",
+    "time": "09:00 AM",
+    "status": "Confirmed",
+    "amount": 899,
+    "address": "12A, Lajpat Nagar, New Delhi",
+    "note": "Pet at home - is safe.",
+    "createdAt": "2024-04-15T11:00:00Z"
+  },
+  {
+    "_id": "B-1004",
+    "customerId": "u1",
+    "providerId": "p4",
+    "serviceId": 104,
+    "date": "2024-03-05",
+    "time": "11:00 AM",
+    "status": "Cancelled",
+    "amount": 1200,
+    "address": "12A, Lajpat Nagar, New Delhi",
+    "note": "",
+    "createdAt": "2024-03-01T10:00:00Z"
+  },
+  {
+    "_id": "B-1005",
+    "customerId": "u2",
+    "providerId": "p6",
+    "serviceId": 106,
+    "date": "2024-05-20",
+    "time": "10:00 AM",
+    "status": "Confirmed",
+    "amount": 18000,
+    "address": "45, Andheri West, Mumbai",
+    "note": "Modern design preferred.",
+    "createdAt": "2024-05-12T10:00:00Z"
+  }
+]

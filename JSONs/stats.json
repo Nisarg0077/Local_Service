@@ -1,0 +1,10 @@
+{
+  "users": 15234,
+  "providers": 1045,
+  "bookings": 54302,
+  "revenue": 8500240,
+  "pendingApprovals": 5,
+  "activeJobs": 312,
+  "avgRating": 4.7,
+  "refunds": 23
+}
