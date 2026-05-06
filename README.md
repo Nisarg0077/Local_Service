@@ -44,7 +44,7 @@ A robust and modern MERN (MongoDB, Express, React, Node.js) stack application de
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/rushabh07/local_service.git
+git clone https://github.com/Nisarg0077/local_service.git
 cd local_service
 ```
 
