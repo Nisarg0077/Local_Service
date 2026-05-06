@@ -18,7 +18,7 @@ export default function BookingsTab({ bookings, onDelete }) {
       </h1>
 
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-thin">
           <table className="min-w-full text-sm text-left whitespace-nowrap">
             <thead className="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 capitalize">
               <tr>

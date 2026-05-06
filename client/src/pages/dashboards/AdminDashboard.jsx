@@ -64,7 +64,6 @@ export default function AdminDashboard() {
   const [reviews, setReviews] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  // console.log(reviews);
   // Sync state if URL changes directly
   useEffect(() => {
     if (activeTabfromURL && validTabs.includes(activeTabfromURL)) {
@@ -120,52 +119,26 @@ export default function AdminDashboard() {
   };
 
   const fetchServices = async () => {
-    try {
-      const res = await api.get("/services");
-      setServices(res.data);
-    } catch (e) {
-      toast.error("Failed to fetch services");
-    }
+    try { const res = await api.get("/services"); setServices(res.data); } catch (e) { toast.error("Failed to fetch services"); }
   };
   const fetchProviders = async () => {
-    try {
-      const res = await api.get("/providers");
-      setProviders(res.data);
-    } catch (e) {
-      toast.error("Failed to fetch providers");
-    }
+    try { const res = await api.get("/providers"); setProviders(res.data); } catch (e) { toast.error("Failed to fetch providers"); }
   };
   const fetchUsers = async () => {
-    try {
-      const res = await api.get("/userroutes");
-      setUsers(res.data);
-    } catch (e) {
-      toast.error("Failed to fetch users");
-    }
+    try { const res = await api.get("/userroutes"); setUsers(res.data); } catch (e) { toast.error("Failed to fetch users"); }
   };
   const fetchBookings = async () => {
-    try {
-      const res = await api.get("/bookings");
-      setBookings(res.data);
-    } catch (e) {
-      toast.error("Failed to fetch bookings");
-    }
+    try { const res = await api.get("/bookings"); setBookings(res.data); } catch (e) { toast.error("Failed to fetch bookings"); }
   };
   const fetchReviews = async () => {
-    try {
-      const res = await api.get("/reviews/approved");
-      setReviews(res.data);
-    } catch (e) {
-      toast.error("Failed to fetch reviews");
-    }
+    try { const res = await api.get("/reviews/approved"); setReviews(res.data); } catch (e) { toast.error("Failed to fetch reviews"); }
   };
   const fetchCategories = async () => {
-    try {
-      const res = await api.get("/categories");
-      setCategories(res.data);
-    } catch (e) {
-      toast.error("Failed to fetch categories");
-    }
+    try { const res = await api.get("/categories"); setCategories(res.data); } catch (e) { toast.error("Failed to fetch categories"); }
+  };
+
+  const handleCategorySave = () => {
+    fetchCategories();
   };
 
   const deleteItem = async (type, id) => {
@@ -237,62 +210,69 @@ export default function AdminDashboard() {
       case "reviews":
         return <ReviewsTab reviews={reviews} onDelete={deleteItem} />;
       case "categories":
-        return <CategoriesTab categories={categories} onDelete={deleteItem} />;
+        return (
+          <CategoriesTab
+            categories={categories}
+            onDelete={deleteItem}
+            onSave={handleCategorySave}
+          />
+        );
       default:
         return <OverviewTab stats={stats} onTabChange={handleTabChange} />;
     }
   };
 
   return (
-    <div className="dark:bg-slate-900 min-h-full font-sans">
-      <div className="flex flex-col md:flex-row min-h-full">
-        {/* SIDEBAR */}
-        <aside className="w-full md:w-64 shrink-0 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex flex-col pt-4">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-700">
-            <h3 className="font-heading font-bold text-slate-800 dark:text-white text-xl">
+    <div className="dark:bg-slate-900 min-h-[calc(100vh-64px)] font-sans">
+      <div className="flex flex-col md:flex-row min-h-[calc(100vh-64px)]">
+        {/* SIDEBAR - Sticky on desktop, scrollable on mobile */}
+        <aside className="w-full md:w-64 shrink-0 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex flex-col md:sticky md:top-16 md:h-[calc(100vh-64px)] md:overflow-y-auto">
+          <div className="p-4 md:p-6 border-b border-slate-100 dark:border-slate-700">
+            <h3 className="font-bold text-slate-800 dark:text-white text-lg md:text-xl">
               ⚡ Admin Panel
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               SmartLocal Management
             </p>
           </div>
-          <nav className="flex-1 p-4 space-y-1">
+          <nav className="flex-1 p-3 md:p-4 space-y-1">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.id}
                   onClick={() => handleTabChange(item.id)}
-                  className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-3 w-full px-3 md:px-4 py-2.5 md:py-3 rounded-xl text-sm font-medium transition-colors ${
                     activeTab === item.id
-                      ? "bg-indigo-600 text-white"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-800 dark:hover:text-white"
+                      ? "bg-indigo-600 text-white shadow-lg"
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-slate-800 dark:hover:text-white"
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  {item.label}
+                  <Icon className="w-5 h-5 shrink-0" />
+                  <span className="truncate">{item.label}</span>
                 </button>
               );
             })}
           </nav>
-          <div className="p-4 border-t border-slate-100 dark:border-slate-700 space-y-2">
-            <div className="px-4 py-3 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-xl">
+          <div className="p-3 md:p-4 border-t border-slate-100 dark:border-slate-700 space-y-2">
+            <div className="px-3 md:px-4 py-2.5 md:py-3 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-xl">
               <p className="text-xs text-green-600 dark:text-green-500 font-semibold flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />{" "}
-                All Systems Operational
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
+                <span className="truncate">All Systems Operational</span>
               </p>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 w-full px-4 py-2.5 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl text-sm font-medium transition-colors"
+              className="flex items-center gap-2 w-full px-3 md:px-4 py-2.5 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl text-sm font-medium transition-colors"
             >
-              <LogOut className="w-4 h-4" /> Logout
+              <LogOut className="w-4 h-4 shrink-0" />
+              <span>Logout</span>
             </button>
           </div>
         </aside>
 
-        {/* MAIN CONTENT AREA */}
-        <main className="flex-1 bg-slate-50 dark:bg-slate-900/50 p-4 md:p-8 overflow-auto">
+        {/* MAIN CONTENT AREA - Scrollable */}
+        <main className="flex-1 bg-slate-50 dark:bg-slate-900/50 p-4 md:p-6 lg:p-8 overflow-y-auto min-h-[calc(100vh-64px)]">
           {renderTabContent()}
         </main>
       </div>

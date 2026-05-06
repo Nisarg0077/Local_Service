@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Save } from 'lucide-react';
-import api from "../../services/api";
+import { ArrowLeft, Save } from "lucide-react";
+import api, { categoriesAPI } from "../../services/api";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
@@ -9,6 +9,8 @@ export default function AddService() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+
   const [service, setService] = useState({
     title: "",
     category: "",
@@ -17,7 +19,7 @@ export default function AddService() {
     includes: "",
     image: "",
     duration: "",
-    description: ""
+    description: "",
   });
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -28,6 +30,20 @@ export default function AddService() {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const res = await categoriesAPI.getAll();
+      console.log(res.data);
+      setCategories(res.data);
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
   const generateServiceId = async () => {
     try {
       const res = await api.get("/services");
@@ -35,13 +51,12 @@ export default function AddService() {
 
       let maxId = 0;
 
-      services.forEach(service => {
+      services.forEach((service) => {
         const id = Number(service.id);
         if (id > maxId) maxId = id;
       });
 
       return maxId + 1;
-
     } catch (error) {
       console.error("ID generation failed", error);
       return Date.now(); // fallback unique number
@@ -66,7 +81,6 @@ export default function AddService() {
   //   }
   // };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -85,14 +99,19 @@ export default function AddService() {
       formData.append("title", service.title);
       formData.append("category", service.category);
       formData.append("price", Number(service.price));
-      formData.append("priceType", service.priceType === 'start' ? 'starting' : service.priceType);
+      formData.append(
+        "priceType",
+        service.priceType === "start" ? "starting" : service.priceType,
+      );
       formData.append("duration", service.duration);
       formData.append("description", service.description);
       formData.append("providerId", user?.uid || "");
-      
-      const includesArray = service.includes ? service.includes.split(',').map(item => item.trim()) : [];
-      includesArray.forEach(item => formData.append("includes[]", item));
-      
+
+      const includesArray = service.includes
+        ? service.includes.split(",").map((item) => item.trim())
+        : [];
+      includesArray.forEach((item) => formData.append("includes[]", item));
+
       if (service.image) {
         formData.append("image", service.image);
       }
@@ -104,9 +123,8 @@ export default function AddService() {
       navigate(
         user?.role === "provider"
           ? "/provider/dashboard/services"
-          : "/admin/dashboard/services"
+          : "/admin/dashboard/services",
       );
-
     } catch (error) {
       toast.error("Failed to add service. Please try again.");
       console.error(error);
@@ -115,13 +133,17 @@ export default function AddService() {
     }
   };
 
-
-
   return (
     <div className="bg-slate-50 dark:bg-slate-900 min-h-screen py-10">
       <div className="max-w-4xl mx-auto px-4">
         <button
-          onClick={() => navigate(user?.role === 'provider' ? "/provider/dashboard/services" : "/admin/dashboard/services")}
+          onClick={() =>
+            navigate(
+              user?.role === "provider"
+                ? "/provider/dashboard/services"
+                : "/admin/dashboard/services",
+            )
+          }
           className="flex items-center gap-2 text-indigo-600 font-medium mb-6 hover:text-indigo-700 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
@@ -132,9 +154,14 @@ export default function AddService() {
             Add New Service
           </h2>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Service Name *</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Service Name *
+              </label>
               <input
                 name="title"
                 placeholder="e.g. AC Repair"
@@ -144,17 +171,33 @@ export default function AddService() {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Category *</label>
-              <input
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Category *
+              </label>
+              {/* <input
                 name="category"
                 placeholder="e.g. Electrician"
                 onChange={handleChange}
                 className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-white"
-              />
+              />*/}
+              <select
+                name="category"
+                onChange={handleChange}
+                className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-white"
+              >
+                <option value="">select category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>{" "}
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Price (₹) *</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Price (₹) *
+              </label>
               <input
                 name="price"
                 type="number"
@@ -165,7 +208,9 @@ export default function AddService() {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Price Type</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Price Type
+              </label>
               <select
                 name="priceType"
                 onChange={handleChange}
@@ -178,7 +223,9 @@ export default function AddService() {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Duration</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Duration
+              </label>
               <input
                 name="duration"
                 placeholder="Example: 2 Hours"
@@ -188,7 +235,9 @@ export default function AddService() {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Includes (Comma separated)</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Includes (Comma separated)
+              </label>
               <input
                 name="includes"
                 placeholder="e.g. Filter cleaning, Gas check"
@@ -198,7 +247,9 @@ export default function AddService() {
             </div>
 
             <div className="flex flex-col md:col-span-2">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Service Image</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Service Image
+              </label>
               <input
                 type="file"
                 name="image"
@@ -209,7 +260,9 @@ export default function AddService() {
             </div>
 
             <div className="flex flex-col md:col-span-2">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Description</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Description
+              </label>
               <textarea
                 name="description"
                 placeholder="Detailed description of the service..."
@@ -223,10 +276,10 @@ export default function AddService() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition shadow ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition shadow ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
               >
                 <Save className="w-5 h-5" />
-                {loading ? 'Saving...' : 'Add Service'}
+                {loading ? "Saving..." : "Add Service"}
               </button>
             </div>
           </form>

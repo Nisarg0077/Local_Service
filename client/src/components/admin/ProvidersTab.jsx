@@ -15,15 +15,15 @@ export default function ProvidersTab({ providers, onDelete }) {
       <h1 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white">Provider Management</h1>
 
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
+        <div className="overflow-x-auto scrollbar-thin">
+          <table className="w-full text-sm text-left min-w-[700px]">
             <thead className="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 capitalize">
               <tr>
-                <th className="px-6 py-4 font-semibold">Provider details</th>
-                <th className="px-6 py-4 font-semibold">Business</th>
-                <th className="px-6 py-4 font-semibold">Performance</th>
-                <th className="px-6 py-4 font-semibold">Status</th>
-                <th className="px-6 py-4 font-semibold text-center">Action</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">Provider details</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">Business</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">Performance</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">Status</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -31,33 +31,33 @@ export default function ProvidersTab({ providers, onDelete }) {
                 <tr><td colSpan="5" className="text-center py-8 text-slate-500">No providers found.</td></tr>
               ) : providers.map(p => (
                 <tr key={p._id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                  <td className="px-6 py-4">
+                  <td className="px-4 md:px-6 py-3 md:py-4">
                     <div className="flex items-center gap-3">
                       {p.avatar ? (
-                        <img src={p.avatar.startsWith('http') ? p.avatar : `http://localhost:3000${p.avatar}`} alt="Avatar" className="w-10 h-10 rounded-full object-cover" />
+                        <img src={p.avatar.startsWith('http') ? p.avatar : `http://localhost:3000${p.avatar}`} alt="Avatar" className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shrink-0">
                           {p.name?.charAt(0) || 'P'}
                         </div>
                       )}
-                      <div>
-                        <p className="font-bold text-slate-800 dark:text-white">{p.name}</p>
-                        <p className="text-xs text-slate-500">{p.email}</p>
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-800 dark:text-white truncate">{p.name}</p>
+                        <p className="text-xs text-slate-500 truncate">{p.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-slate-700 dark:text-slate-300">{p?.verifiedBadge ? <CheckCircle className='w-5 h-5 text-green-600 bg-green-100 rounded-full p-0.5' /> : "Not Verified"}</p>
+                  <td className="px-4 md:px-6 py-3 md:py-4">
+                    <p className="font-medium text-slate-700 dark:text-slate-300">{p?.verifiedBadge ? <CheckCircle className='w-4 h-4 md:w-5 md:h-5 text-green-600 bg-green-100 rounded-full p-0.5' /> : "Not Verified"}</p>
                     {/* <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold bg-blue-50 text-blue-600 rounded-full">{p.category}</span> */}
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm">
-                      <span className="font-bold text-amber-500">⭐ {p.rating || 0}</span> ({p.reviews || 0} reviews)
-                      <div className="text-xs text-slate-500 mt-1">Jobs: {p.completedJobs || 0}</div>
+                  <td className="px-4 md:px-6 py-3 md:py-4">
+                    <div className="text-sm whitespace-nowrap">
+                      <span className="font-bold text-amber-500">⭐ {p.rating || 0}</span> ({p.reviews || 0})
+                      <div className="text-xs text-slate-500">Jobs: {p.completedJobs || 0}</div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 text-xs font-bold rounded-full ${p.isAvailable ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
+                  <td className="px-4 md:px-6 py-3 md:py-4">
+                    <span className={`px-2 py-0.5 md:px-2.5 md:py-1 text-xs font-bold rounded-full whitespace-nowrap ${p.isAvailable ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}>
                       {p.isAvailable ? "Available" : "Offline"}
                     </span>
                   </td>

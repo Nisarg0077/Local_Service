@@ -81,16 +81,15 @@ export default function ReviewsTab({ reviews, onDelete }) {
       </div>
 
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
+        <div className="overflow-x-auto scrollbar-thin">
+          <table className="min-w-[700px] text-sm text-left">
             <thead className="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 capitalize">
               <tr>
-                <th className="px-6 py-4 font-semibold">UserID</th>
-                <th className="px-6 py-4 font-semibold">User Name</th>
-                <th className="px-6 py-4 font-semibold">Rating</th>
-                <th className="px-6 py-4 font-semibold lg:w-1/2">Comment</th>
-                <th className="px-6 py-4 font-semibold">Date</th>
-                <th className="px-6 py-4 font-semibold text-center">Action</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">User</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">Rating</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold lg:w-1/2">Comment</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">Date</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -100,30 +99,29 @@ export default function ReviewsTab({ reviews, onDelete }) {
                 const userData = usersMap[r.userId];
                 return (
                   <tr key={r._id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
-                    <td className="px-6 py-4">{r.userId}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-3 md:py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-500 font-bold overflow-hidden">
-                          {userData?.avatar ? <img src={userData?.avatar} className='w-full h-full object-fill' alt={userData?.name} /> : 'U'}
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-500 font-bold overflow-hidden shrink-0">
+                          {userData?.avatar ? <img src={userData?.avatar} className='w-full h-full object-cover' alt={userData?.name} /> : 'U'}
                         </div>
-                        <span className="font-bold text-slate-800 dark:text-white">{userData?.name}</span>
+                        <span className="font-bold text-slate-800 dark:text-white truncate">{userData?.name || 'Guest'}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-amber-500 font-bold whitespace-nowrap">
+                    <td className="px-4 md:px-6 py-3 md:py-4 text-amber-500 font-bold whitespace-nowrap">
                       {'⭐'.repeat(Math.round(r.rating || 0))} <span className="text-slate-500 font-normal ml-1">({r.rating})</span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-3 md:py-4">
                       <p className="text-slate-600 dark:text-slate-300 line-clamp-2 md:line-clamp-none">{r.comment}</p>
                     </td>
-                    <td className="px-6 py-4 text-slate-500 whitespace-nowrap">{r.date || 'N/A'}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-3 md:py-4 text-slate-500 whitespace-nowrap">{r.date || 'N/A'}</td>
+                    <td className="px-4 md:px-6 py-3 md:py-4">
                       <div className="flex justify-center">
                         <button
                           onClick={() => handleDelete(r._id)}
-                          className="p-2 text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 rounded-lg transition-colors"
+                          className="p-1.5 md:p-2 text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/30 dark:hover:bg-red-900/50 rounded-lg transition-colors"
                           title="Delete"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         </button>
                       </div>
                     </td>

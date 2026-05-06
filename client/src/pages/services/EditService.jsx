@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save } from 'lucide-react';
-import api from "../../services/api";
+import { ArrowLeft, Save } from "lucide-react";
+import api, { categoriesAPI } from "../../services/api";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
@@ -11,6 +11,7 @@ export default function EditService() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [categories, setCategories] = useState([]);
   const [service, setService] = useState({
     title: "",
     category: "",
@@ -19,7 +20,7 @@ export default function EditService() {
     includes: "",
     image: "",
     duration: "",
-    description: ""
+    description: "",
   });
 
   useEffect(() => {
@@ -36,6 +37,20 @@ export default function EditService() {
       setFetching(false);
     }
   };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await categoriesAPI.getAll();
+      console.log(res.data);
+      setCategories(res.data);
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -55,16 +70,16 @@ export default function EditService() {
     setLoading(true);
     try {
       const formData = new FormData();
-      Object.keys(service).forEach(key => {
-        if (key === 'includes' && Array.isArray(service[key])) {
-          service[key].forEach(item => formData.append("includes[]", item));
-        } else if (key === 'image') {
+      Object.keys(service).forEach((key) => {
+        if (key === "includes" && Array.isArray(service[key])) {
+          service[key].forEach((item) => formData.append("includes[]", item));
+        } else if (key === "image") {
           // Only send image if user selected a new file
           if (service[key] instanceof File) {
             formData.append(key, service[key]);
           }
           // Skip string image values — the backend keeps the existing one
-        } else if (key === '_id' || key === '__v') {
+        } else if (key === "_id" || key === "__v") {
           // Skip MongoDB internal fields
         } else {
           formData.append(key, service[key]);
@@ -73,7 +88,11 @@ export default function EditService() {
 
       await api.put(`/services/${serviceId}`, formData);
       toast.success("Service updated successfully!");
-      navigate(user?.role === 'provider' ? "/provider/dashboard/services" : "/admin/dashboard/services");
+      navigate(
+        user?.role === "provider"
+          ? "/provider/dashboard/services"
+          : "/admin/dashboard/services",
+      );
     } catch (error) {
       toast.error("Failed to update service. Please try again.");
     } finally {
@@ -82,14 +101,24 @@ export default function EditService() {
   };
 
   if (fetching) {
-     return <div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div></div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    );
   }
 
   return (
     <div className="bg-slate-50 dark:bg-slate-900 min-h-[calc(100vh-64px)] py-10">
       <div className="max-w-4xl mx-auto px-4">
         <button
-          onClick={() => navigate(user?.role === 'provider' ? "/provider/dashboard/services" : "/admin/dashboard/services")}
+          onClick={() =>
+            navigate(
+              user?.role === "provider"
+                ? "/provider/dashboard/services"
+                : "/admin/dashboard/services",
+            )
+          }
           className="flex items-center gap-2 text-indigo-600 font-medium mb-6 hover:text-indigo-700 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
@@ -100,9 +129,14 @@ export default function EditService() {
             Update Service
           </h2>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Service Name *</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Service Name *
+              </label>
               <input
                 name="title"
                 value={service.title || ""}
@@ -113,18 +147,34 @@ export default function EditService() {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Category *</label>
-              <input
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Category *
+              </label>
+              {/* <input
                 name="category"
                 value={service.category || ""}
                 onChange={handleChange}
                 placeholder="e.g. Electrician"
                 className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-white"
-              />
+              />*/}
+              <select
+                name="category"
+                onChange={handleChange}
+                className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-white"
+              >
+                <option value="">select category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>{" "}
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Price (₹) *</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Price (₹) *
+              </label>
               <input
                 name="price"
                 type="number"
@@ -136,7 +186,9 @@ export default function EditService() {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Price Type</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Price Type
+              </label>
               <select
                 name="priceType"
                 value={service.priceType || ""}
@@ -150,7 +202,9 @@ export default function EditService() {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Duration</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Duration
+              </label>
               <input
                 name="duration"
                 value={service.duration || ""}
@@ -161,7 +215,9 @@ export default function EditService() {
             </div>
 
             <div className="flex flex-col">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Includes (Comma separated)</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Includes (Comma separated)
+              </label>
               <input
                 name="includes"
                 value={service.includes || ""}
@@ -172,7 +228,9 @@ export default function EditService() {
             </div>
 
             <div className="flex flex-col md:col-span-2">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Service Image</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Service Image
+              </label>
               <input
                 type="file"
                 name="image"
@@ -180,13 +238,17 @@ export default function EditService() {
                 onChange={handleChange}
                 className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-white file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
               />
-              {typeof service.image === 'string' && service.image && (
-                <p className="mt-2 text-xs text-slate-500 italic">Current image: {service.image}</p>
+              {typeof service.image === "string" && service.image && (
+                <p className="mt-2 text-xs text-slate-500 italic">
+                  Current image: {service.image}
+                </p>
               )}
             </div>
 
             <div className="flex flex-col md:col-span-2">
-              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">Description</label>
+              <label className="font-semibold text-slate-700 dark:text-slate-300 mb-1.5 text-sm">
+                Description
+              </label>
               <textarea
                 name="description"
                 value={service.description || ""}
@@ -201,10 +263,10 @@ export default function EditService() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition shadow ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition shadow ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
               >
                 <Save className="w-5 h-5" />
-                {loading ? 'Saving...' : 'Update Service'}
+                {loading ? "Saving..." : "Update Service"}
               </button>
             </div>
           </form>
