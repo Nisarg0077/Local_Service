@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
-import { useParams, useLocation, useNavigate, Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import {
-  Star, MapPin, Clock, BadgeCheck, Heart, Share2,
-  ChevronRight, CheckCircle, Phone, ArrowLeft,
-} from 'lucide-react';
+  Star,
+  MapPin,
+  Clock,
+  BadgeCheck,
+  Heart,
+  Share2,
+  ChevronRight,
+  CheckCircle,
+  Phone,
+  ArrowLeft,
+} from "lucide-react";
 // import { mockServices, mockProviders, mockReviews } from '../data/mockData';
-import { useAuth } from '../context/AuthContext';
-import Button from '../components/common/Button';
-import Badge from '../components/common/Badge';
-import { formatCurrency, formatDate, getInitials } from '../utils';
-import toast from 'react-hot-toast';
-import { reviewsAPI, usersAPI } from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import Button from "../components/common/Button";
+import Badge from "../components/common/Badge";
+import { formatCurrency, formatDate, getInitials } from "../utils";
+import toast from "react-hot-toast";
+import { reviewsAPI, usersAPI, bookingsAPI } from "../services/api";
 import { useEffect } from "react";
 
 export default function ServiceDetails() {
@@ -21,15 +29,18 @@ export default function ServiceDetails() {
   const [reviews, setReviews] = useState([]);
   const service = location.state?.service;
   const provider = location.state?.provider;
-  const isRestricted = !user || user?.role === "provider" || user?.role === "admin";
+  console.log(provider);
+  const isRestricted =
+    !user || user?.role === "provider" || user?.role === "admin";
   // const isFavorited = (user?.favorites || []).map(Number).includes(Number(service?.id));
   const isFavorited = user?.favorites
-  ? user.favorites.map(Number).includes(Number(service?.id))
-  : false;
+    ? user.favorites.map(Number).includes(Number(service?.id))
+    : false;
   // const [userName, setUserName] = useState({});
   // const [userAvatars, setUserAvatars] = useState({});
 
   const [usersMap, setUsersMap] = useState({});
+  const [bookings, setBookings] = useState([]);
 
   useEffect(() => {
     // const fetchUsers = async () => {
@@ -61,61 +72,70 @@ export default function ServiceDetails() {
     //   }
     // };
 
-   const fetchUsers = async () => {
-  try {
-    const uniqueUserIds = [...new Set(reviews.map(r => r.userId))];
+    const fetchUsers = async () => {
+      try {
+        const uniqueUserIds = [...new Set(reviews.map((r) => r.userId))];
 
-    const map = {};
+        const map = {};
 
-    await Promise.all(
-      uniqueUserIds.map(async (id) => {
+        await Promise.all(
+          uniqueUserIds.map(async (id) => {
+            // ✅ Skip invalid IDs (VERY IMPORTANT)
+            if (!id || typeof id !== "string") {
+              map[id] = {
+                name: "Anonymous",
+                avatar: "/default-avatar.png",
+              };
+              return;
+            }
 
-        // ✅ Skip invalid IDs (VERY IMPORTANT)
-        if (!id || typeof id !== "string") {
-          map[id] = {
-            name: "Anonymous",
-            avatar: "/default-avatar.png",
-          };
-          return;
-        }
+            try {
+              const res = await usersAPI.getUser(id);
 
-        try {
-          const res = await usersAPI.getUser(id);
+              map[id] = {
+                name: res.data.name || "Anonymous",
+                avatar: res.data.avatar
+                  ? res.data.avatar.startsWith("http")
+                    ? res.data.avatar
+                    : `http://localhost:3000${res.data.avatar}`
+                  : "/default-avatar.png",
+              };
+            } catch (err) {
+              // ✅ Ignore 404 silently
+              if (err.response?.status !== 404) {
+                console.error("User fetch error:", err);
+              }
 
-          map[id] = {
-            name: res.data.name || "Anonymous",
-            avatar: res.data.avatar
-              ? res.data.avatar.startsWith("http")
-                ? res.data.avatar
-                : `http://localhost:3000${res.data.avatar}`
-              : "/default-avatar.png",
-          };
+              map[id] = {
+                name: "Anonymous",
+                avatar: "/default-avatar.png",
+              };
+            }
+          }),
+        );
 
-        } catch (err) {
+        setUsersMap(map);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-          // ✅ Ignore 404 silently
-          if (err.response?.status !== 404) {
-            console.error("User fetch error:", err);
-          }
+    if (!reviews.length) return;
 
-          map[id] = {
-            name: "Anonymous",
-            avatar: "/default-avatar.png",
-          };
-        }
-      })
-    );
+    fetchUsers();
 
-    setUsersMap(map);
-
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-     if (!reviews.length) return;
-
-  fetchUsers();
+    const fetchBookings = async () => {
+      try {
+        const id = user?.uid;
+        const res = await bookingsAPI.getByUser(id);
+        // const myServicesIds = services.length > 0 ? services.map(s => s._id || s.id) : (await api.get('/services')).data.filter(s => s.providerId === user?._id || s.providerId === user?.id).map(s => s._id);
+        // const myBookings = res.data.filter(b => b.providerId === user?._id || b.providerId === user?.id || myServicesIds.includes(b.serviceId));
+        setBookings(res.data);
+      } catch (e) {
+        toast.error("Failed to fetch bookings");
+      }
+    };
+    fetchBookings();
   }, [reviews]);
 
   useEffect(() => {
@@ -125,7 +145,6 @@ export default function ServiceDetails() {
 
         const res = await reviewsAPI.getByService(service.id);
         setReviews(res.data);
-
       } catch (error) {
         console.error("Failed to fetch reviews:", error);
       }
@@ -134,14 +153,18 @@ export default function ServiceDetails() {
     fetchReviews();
   }, [service]);
 
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   if (!service) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 dark:bg-slate-900">
         <div className="text-6xl">😕</div>
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Service Not Found</h2>
-        <Link to="/services"><Button>Browse Services</Button></Link>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
+          Service Not Found
+        </h2>
+        <Link to="/services">
+          <Button>Browse Services</Button>
+        </Link>
       </div>
     );
   }
@@ -167,33 +190,34 @@ export default function ServiceDetails() {
   //     toast.error('Failed to update favorites');
   //   }
   // };
+  //
 
+  const completedBookings = bookings.filter((b) => b.status === "Completed");
 
   const handleFavorite = async () => {
-  if (!isAuthenticated || !user) {
-    toast.error('Please login first');
-    navigate('/login');
-    return;
-  }
-}
+    if (!isAuthenticated || !user) {
+      toast.error("Please login first");
+      navigate("/login");
+      return;
+    }
+  };
 
   const handleBook = () => {
     if (!isAuthenticated) {
-      toast.error('Please login to book a service');
-      navigate('/login', { state: { from: location } });
+      toast.error("Please login to book a service");
+      navigate("/login", { state: { from: location } });
       return;
     }
-    navigate('/booking', { state: { service, provider } });
+    navigate("/booking", { state: { service, provider } });
   };
 
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href);
-    toast.success('Link copied to clipboard!');
+    toast.success("Link copied to clipboard!");
   };
 
   return (
     <div className="min-h-screen dark:bg-slate-900 pb-20">
-
       {/* Breadcrumb / Back Navigation */}
       <div className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6 py-3">
         <div className="max-w-6xl mx-auto flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
@@ -204,27 +228,46 @@ export default function ServiceDetails() {
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">Back</span>
           </button>
-          <span className="text-slate-300 dark:text-slate-600 hidden sm:inline">|</span>
-          <Link to="/" className="hover:text-primary hidden sm:inline transition-colors">Home</Link>
+          <span className="text-slate-300 dark:text-slate-600 hidden sm:inline">
+            |
+          </span>
+          <Link
+            to="/"
+            className="hover:text-primary hidden sm:inline transition-colors"
+          >
+            Home
+          </Link>
           <ChevronRight className="w-3 h-3 hidden sm:inline" />
-          <Link to="/services" className="hover:text-primary transition-colors">Services</Link>
+          <Link to="/services" className="hover:text-primary transition-colors">
+            Services
+          </Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-slate-700 dark:text-slate-200 font-medium truncate max-w-[200px]">{service.title}</span>
+          <span className="text-slate-700 dark:text-slate-200 font-medium truncate max-w-[200px]">
+            {service.title}
+          </span>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
           {/* Left: Main Content */}
           <div className="lg:col-span-2 space-y-6">
-
             {/* Hero Image */}
             <div className="relative rounded-3xl overflow-hidden h-64 sm:h-80 bg-slate-100 dark:bg-slate-800">
               {service.image ? (
-                <img src={service.image.startsWith('http') ? service.image : `http://localhost:3000${service.image}`} alt={service.title} className="w-full h-full object-cover" />
+                <img
+                  src={
+                    service.image.startsWith("http")
+                      ? service.image
+                      : `http://localhost:3000${service.image}`
+                  }
+                  alt={service.title}
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-7xl">🏠</div>
+                <div className="w-full h-full flex items-center justify-center text-7xl">
+                  🏠
+                </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
               <div className="absolute top-4 left-4">
@@ -232,7 +275,9 @@ export default function ServiceDetails() {
               </div>
               {service.popular && (
                 <div className="absolute top-4 right-4">
-                  <span className="px-3 py-1 bg-accent text-white text-xs font-bold rounded-full">⚡ Popular</span>
+                  <span className="px-3 py-1 bg-accent text-white text-xs font-bold rounded-full">
+                    ⚡ Popular
+                  </span>
                 </div>
               )}
             </div>
@@ -244,10 +289,19 @@ export default function ServiceDetails() {
                   {service.title}
                 </h1>
                 <div className="flex gap-2 shrink-0">
-                  <button onClick={handleFavorite} className={`p-2 rounded-xl border-2 transition-all ${isFavorited ? 'border-danger bg-danger/10 text-danger' : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:text-danger hover:border-danger'}`}>
-                    <Heart className="w-5 h-5" fill={isFavorited ? 'currentColor' : 'none'} />
+                  <button
+                    onClick={handleFavorite}
+                    className={`p-2 rounded-xl border-2 transition-all ${isFavorited ? "border-danger bg-danger/10 text-danger" : "border-slate-200 dark:border-slate-700 text-slate-400 hover:text-danger hover:border-danger"}`}
+                  >
+                    <Heart
+                      className="w-5 h-5"
+                      fill={isFavorited ? "currentColor" : "none"}
+                    />
                   </button>
-                  <button onClick={handleShare} className="p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary hover:border-primary transition-all">
+                  <button
+                    onClick={handleShare}
+                    className="p-2 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary hover:border-primary transition-all"
+                  >
                     <Share2 className="w-5 h-5" />
                   </button>
                 </div>
@@ -258,11 +312,18 @@ export default function ServiceDetails() {
                 <div className="flex items-center gap-1.5">
                   <div className="flex">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className={`w-4 h-4 ${i < Math.floor(service.rating) ? 'text-amber-400 fill-amber-400' : 'text-slate-300'}`} />
+                      <Star
+                        key={i}
+                        className={`w-4 h-4 ${i < Math.floor(service.rating) ? "text-amber-400 fill-amber-400" : "text-slate-300"}`}
+                      />
                     ))}
                   </div>
-                  <span className="font-bold text-slate-800 dark:text-white text-sm">{service.rating}</span>
-                  <span className="text-slate-500 text-sm">({service.reviewCount} reviews)</span>
+                  <span className="font-bold text-slate-800 dark:text-white text-sm">
+                    {service.rating}
+                  </span>
+                  <span className="text-slate-500 text-sm">
+                    ({service.reviewCount} reviews)
+                  </span>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400">
                   <Clock className="w-4 h-4" /> {service.duration}
@@ -274,52 +335,71 @@ export default function ServiceDetails() {
                 )}
               </div>
 
-              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{service.description}</p>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                {service.description}
+              </p>
             </div>
 
             {/* Tabs */}
             <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden">
               <div className="flex border-b border-slate-100 dark:border-slate-700">
-                {['overview', 'includes', 'reviews'].map(tab => (
+                {["overview", "includes", "reviews"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex-1 py-4 text-sm font-bold capitalize transition-colors ${activeTab === tab ? 'text-primary border-b-2 border-primary' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    className={`flex-1 py-4 text-sm font-bold capitalize transition-colors ${activeTab === tab ? "text-primary border-b-2 border-primary" : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"}`}
                   >
-                    {tab} {tab === 'reviews' && `(${reviews.length})`}
+                    {tab} {tab === "reviews" && `(${reviews.length})`}
                   </button>
                 ))}
               </div>
               <div className="p-6">
-                {activeTab === 'overview' && (
+                {activeTab === "overview" && (
                   <div className="space-y-4">
-                    <h3 className="font-bold text-slate-800 dark:text-white">Service Details</h3>
+                    <h3 className="font-bold text-slate-800 dark:text-white">
+                      Service Details
+                    </h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
                         <p className="text-xs text-slate-500 mb-1">Duration</p>
-                        <p className="font-bold text-slate-800 dark:text-white">{service.duration}</p>
+                        <p className="font-bold text-slate-800 dark:text-white">
+                          {service.duration}
+                        </p>
                       </div>
                       <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
-                        <p className="text-xs text-slate-500 mb-1">Price Type</p>
-                        <p className="font-bold text-slate-800 dark:text-white capitalize">{service.priceType}</p>
+                        <p className="text-xs text-slate-500 mb-1">
+                          Price Type
+                        </p>
+                        <p className="font-bold text-slate-800 dark:text-white capitalize">
+                          {service.priceType}
+                        </p>
                       </div>
                       <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
                         <p className="text-xs text-slate-500 mb-1">Category</p>
-                        <p className="font-bold text-slate-800 dark:text-white">{service.category}</p>
+                        <p className="font-bold text-slate-800 dark:text-white">
+                          {service.category}
+                        </p>
                       </div>
                       <div className="p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
-                        <p className="text-xs text-slate-500 mb-1">Satisfaction</p>
+                        <p className="text-xs text-slate-500 mb-1">
+                          Satisfaction
+                        </p>
                         <p className="font-bold text-success">98% Positive</p>
                       </div>
                     </div>
                   </div>
                 )}
-                {activeTab === 'includes' && (
+                {activeTab === "includes" && (
                   <div>
-                    <h3 className="font-bold text-slate-800 dark:text-white mb-4">What's Included</h3>
+                    <h3 className="font-bold text-slate-800 dark:text-white mb-4">
+                      What's Included
+                    </h3>
                     <ul className="space-y-3">
                       {(service.includes || []).map((item, i) => (
-                        <li key={i} className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
+                        <li
+                          key={i}
+                          className="flex items-center gap-3 text-slate-700 dark:text-slate-300"
+                        >
                           <CheckCircle className="w-5 h-5 text-success shrink-0" />
                           <span>{item}</span>
                         </li>
@@ -327,25 +407,49 @@ export default function ServiceDetails() {
                     </ul>
                   </div>
                 )}
-                {activeTab === 'reviews' && (
+                {activeTab === "reviews" && (
                   <div className="space-y-4">
                     {reviews.length === 0 ? (
-                      <div className="text-center py-8 text-slate-500">No reviews yet. Be the first!</div>
+                      <div className="text-center py-8 text-slate-500">
+                        No reviews yet. Be the first!
+                      </div>
                     ) : (
-                      reviews.map(r => (
-                        <div key={r.id || r._id} className="flex gap-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
-                          <img src={usersMap[r.userId]?.avatar?.startsWith('http') ? usersMap[r.userId].avatar : (usersMap[r.userId]?.avatar ? `http://localhost:3000${usersMap[r.userId].avatar}` : "/default-avatar.png")} alt={usersMap[r.userId]?.name || "Anonymous"} className="w-10 h-10 rounded-full shrink-0 object-cover" />
+                      reviews.map((r) => (
+                        <div
+                          key={r.id || r._id}
+                          className="flex gap-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-xl"
+                        >
+                          <img
+                            src={
+                              usersMap[r.userId]?.avatar?.startsWith("http")
+                                ? usersMap[r.userId].avatar
+                                : usersMap[r.userId]?.avatar
+                                  ? `http://localhost:3000${usersMap[r.userId].avatar}`
+                                  : "/default-avatar.png"
+                            }
+                            alt={usersMap[r.userId]?.name || "Anonymous"}
+                            className="w-10 h-10 rounded-full shrink-0 object-cover"
+                          />
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="font-bold text-sm text-slate-800 dark:text-white">{usersMap[r.userId]?.name || "Anonymous"}</span>
-                              <span className="text-xs text-slate-400">{formatDate(r.date)}</span>
+                              <span className="font-bold text-sm text-slate-800 dark:text-white">
+                                {usersMap[r.userId]?.name || "Anonymous"}
+                              </span>
+                              <span className="text-xs text-slate-400">
+                                {formatDate(r.date)}
+                              </span>
                             </div>
                             <div className="flex mb-2">
                               {Array.from({ length: 5 }).map((_, i) => (
-                                <Star key={i} className={`w-3.5 h-3.5 ${i < r.rating ? 'text-amber-400 fill-amber-400' : 'text-slate-300'}`} />
+                                <Star
+                                  key={i}
+                                  className={`w-3.5 h-3.5 ${i < r.rating ? "text-amber-400 fill-amber-400" : "text-slate-300"}`}
+                                />
                               ))}
                             </div>
-                            <p className="text-sm text-slate-600 dark:text-slate-400">{r.comment}</p>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                              {r.comment}
+                            </p>
                           </div>
                         </div>
                       ))
@@ -358,15 +462,20 @@ export default function ServiceDetails() {
 
           {/* Right: Booking Card + Provider */}
           <div className="sticky top-20 space-y-5">
-
             {/* Booking Card */}
             <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 shadow-card">
               <div className="mb-4">
                 <div className="flex items-baseline gap-2 mb-1">
-                  {service.priceType === 'starting' && <span className="text-xs text-slate-400">Starts at</span>}
-                  <span className="text-3xl font-heading font-bold text-slate-800 dark:text-white">{formatCurrency(service.price)}</span>
+                  {service.priceType === "starting" && (
+                    <span className="text-xs text-slate-400">Starts at</span>
+                  )}
+                  <span className="text-3xl font-heading font-bold text-slate-800 dark:text-white">
+                    {formatCurrency(service.price)}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-500">Inclusive of all charges</p>
+                <p className="text-xs text-slate-500">
+                  Inclusive of all charges
+                </p>
               </div>
 
               {/* {
@@ -392,53 +501,78 @@ export default function ServiceDetails() {
                   </>
                 )} */}
 
-                {!user ? (
-  <Button onClick={() => navigate('/login')} fullWidth size="lg" className="mb-3">
-    Login to Continue
-  </Button>
-) : isRestricted ? (
-  <Link to="/services" className="block w-full">
-    <Button variant="outline" fullWidth size="lg" className="mb-3">
-      <ArrowLeft className="w-4 h-4 mr-2" />
-      Back to Services
-    </Button>
-  </Link>
-) : (
-  <>
-    <Button onClick={handleBook} fullWidth size="lg" className="mb-3">
-      Book Now
-    </Button>
-    <Link to="/services" className="block w-full">
-      <Button variant="outline" fullWidth size="lg" className="mb-3">
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Services
-      </Button>
-    </Link>
-  </>
-)}
+              {!user ? (
+                <Button
+                  onClick={() => navigate("/login")}
+                  fullWidth
+                  size="lg"
+                  className="mb-3"
+                >
+                  Login to Continue
+                </Button>
+              ) : isRestricted ? (
+                <Link to="/services" className="block w-full">
+                  <Button
+                    variant="outline"
+                    fullWidth
+                    size="lg"
+                    className="mb-3"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Services
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleBook}
+                    fullWidth
+                    size="lg"
+                    className="mb-3"
+                  >
+                    Book Now
+                  </Button>
+                  <Link to="/services" className="block w-full">
+                    <Button
+                      variant="outline"
+                      fullWidth
+                      size="lg"
+                      className="mb-3"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Back to Services
+                    </Button>
+                  </Link>
+                </>
+              )}
               {/* <Link to="/services" className="block w-full">
                 <Button variant="outline" fullWidth size="lg" className="mb-3">
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Services
                 </Button>
               </Link> */}
-              <p className="text-xs text-center text-slate-500 mb-4">No advance payment required</p>
+              <p className="text-xs text-center text-slate-500 mb-4">
+                No advance payment required
+              </p>
 
               <div className="space-y-2 pt-4 border-t border-slate-100 dark:border-slate-700">
                 <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <CheckCircle className="w-4 h-4 text-success" /> Verified Professional
+                  <CheckCircle className="w-4 h-4 text-success" /> Verified
+                  Professional
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <CheckCircle className="w-4 h-4 text-success" /> Satisfaction Guaranteed
+                  <CheckCircle className="w-4 h-4 text-success" /> Satisfaction
+                  Guaranteed
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <CheckCircle className="w-4 h-4 text-success" /> Free Cancellation (2h before)
+                  <CheckCircle className="w-4 h-4 text-success" /> Free
+                  Cancellation (2h before)
                 </div>
               </div>
             </div>
 
             {/* Provider Card */}
-            {provider && (
+            {/* {provider && (
               <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 shadow-card">
                 <h3 className="font-bold text-slate-700 dark:text-slate-300 text-sm mb-4 uppercase tracking-wider">
                   Your Professional
@@ -484,7 +618,7 @@ export default function ServiceDetails() {
                     <p className="text-lg font-bold text-success">{provider.completedJobs}+</p>
                     <p className="text-[10px] text-slate-500">Jobs</p>
                   </div>
-                </div> */}
+                </div>
 
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
                   {provider.bio}
@@ -492,6 +626,104 @@ export default function ServiceDetails() {
 
                 <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                   <MapPin className="w-3.5 h-3.5" /> {provider.area}
+                </div>
+              </div>
+            )}*/}
+
+            {provider && (
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 shadow-card">
+                <h3 className="font-bold text-slate-700 dark:text-slate-300 text-sm mb-4 uppercase tracking-wider">
+                  Your Professional
+                </h3>
+
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="relative">
+                    <img
+                      src={`http://localhost:3000` + provider.avatar}
+                      alt={provider.name}
+                      className="w-14 h-14 rounded-2xl object-cover ring-2 ring-primary/20"
+                    />
+                    {provider.isAvailable && (
+                      <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-success border-2 border-white dark:border-slate-800 rounded-full" />
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-1">
+                      <p className="font-bold text-slate-800 dark:text-white">
+                        {provider.name}
+                      </p>
+                      {provider.verifiedBadge && (
+                        <BadgeCheck className="w-4 h-4 text-primary" />
+                      )}
+                    </div>
+
+                    <p className="text-xs text-slate-500">
+                      {provider.business}
+                    </p>
+                    <Badge
+                      status={provider.isAvailable ? "Active" : "Inactive"}
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 mb-4 text-center">
+                  {/* Rating Card */}
+                  <div className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                    <p className="text-lg font-bold text-yellow-300 mb-1">
+                      {provider.providerId === service.providerId
+                        ? service.rating
+                        : "not rated yet"}
+                    </p>
+                    <p className="text-md text-slate-500 dark:text-slate-100">
+                      Rating
+                    </p>
+                  </div>
+
+                  {/* Joined At Card - Fix: Separate Month and Year on Two Lines */}
+                  <div className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                    <div className="text-sm font-bold text-slate-800 dark:text-white leading-tight mb-1">
+                      {(() => {
+                        const date = new Date(provider.joinedAt);
+                        const month = date.toLocaleDateString("en-US", {
+                          month: "short",
+                        });
+                        const year = date.getFullYear();
+
+                        return (
+                          <>
+                            <p>{month}</p>
+                            <p>{year}</p>
+                          </>
+                        );
+                      })()}
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-100">
+                      Joined At
+                    </p>
+                  </div>
+
+                  {/* Jobs Card */}
+                  <div className="p-2 bg-slate-50 dark:bg-slate-700 rounded-lg">
+                    <p className="text-lg font-bold text-success mb-1">
+                      {completedBookings.length}
+                    </p>
+                    <p className="text-md text-slate-500 dark:text-slate-100">
+                      Jobs
+                    </p>
+                  </div>
+                </div>
+
+                {/* <p className="text-md text-slate-500 dark:text-slate-400 mb-4">
+                  {(() => {
+                    console.log(provider.bio);
+                    return provider.bio;
+                  })()}
+                </p>*/}
+
+                <div className="flex items-center gap-1 text-md text-slate-500 dark:text-slate-100">
+                  <MapPin className="w-4 h-4" /> {provider.area}
                 </div>
               </div>
             )}

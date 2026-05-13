@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const providerSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+    ref: "User",
   },
 
   providerId: {
-    type: String
+    type: String,
   },
 
   name: String,
@@ -27,8 +27,8 @@ const providerSchema = new mongoose.Schema({
       "Painting",
       "Carpentry",
       "Pest Control",
-      "Appliances"
-    ]
+      "Appliances",
+    ],
   },
 
   rating: { type: Number, default: 0 },
@@ -41,30 +41,30 @@ const providerSchema = new mongoose.Schema({
 
   isAvailable: {
     type: Boolean,
-    default: true
+    default: true,
   },
 
   completedJobs: {
     type: Number,
-    default: 0
+    default: 0,
   },
 
   earnings: {
     type: Number,
-    default: 0
+    default: 0,
   },
 
   bio: String,
 
   verifiedBadge: {
     type: Boolean,
-    default: false
+    default: false,
   },
 
   joinedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("Provider", providerSchema);

@@ -11,7 +11,7 @@ import {
   Star,
   User,
 } from "lucide-react";
-import api from "../../services/api";
+import api, { usersAPI } from "../../services/api";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { getInitials } from "../../utils";
@@ -93,14 +93,61 @@ export default function ProviderDashboard() {
     navigate("/");
   };
 
-  const toggleAvailability = () => {
-    setIsAvailable((p) => !p);
-    toast.success(
-      isAvailable
-        ? "You are now offline"
-        : "You are now available for bookings!",
-    );
-  };
+  // const toggleAvailability = async () => {
+  //   setIsAvailable((p) => !p);
+  //   // if (!isAvailable) {
+  //   //   user.isAvailable = false;
+  //   //   const res = await usersAPI.updateUser(user.id, {
+  //   //     user: { isAvailable: false },
+  //   //   });
+  //   //   console.log(res.data);
+  //   // } else {
+  //   //   user.isAvailable = true;
+  //   //   const res = await usersAPI.updateUser(user.id, {
+  //   //     user: { isAvailable: true },
+  //   //   });
+  //   //   console.log(res.data);
+  //   // }
+  //   try {
+  //     await usersAPI.updateUser(user.id, {
+  //       user: { isAvailable: !isAvailable },
+  //     });
+  //     toast.success(
+  //       isAvailable
+  //         ? "You are now offline"
+  //         : "You are now available for bookings!",
+  //     );
+  //   } catch (error) {
+  //     toast.error(error.toString());
+  //   }
+  // };
+
+  // const toggleAvailability = async () => {
+  //   // 1. Calculate the new value once
+  //   const newAvailability = !isAvailable;
+  //   console.log(user.isAvailable, newAvailability);
+  //   setupdatedUser({ ...user, isAvailable: newAvailability });
+  //   try {
+  //     // 2. Make the API call first
+  //     console.log(user.isAvailable);
+  //     const res = await usersAPI.updateAvailability(user.uid, updatedUser);
+
+  //     console.log(res.data);
+
+  //     // 3. Only update the UI if the API call succeeds
+  //     setIsAvailable(newAvailability);
+
+  //     // 4. Show success message (using the new variable makes the logic easier to read)
+  //     toast.success(
+  //       newAvailability
+  //         ? "You are now available for bookings!"
+  //         : "You are now offline",
+  //     );
+  //   } catch (error) {
+  //     // UI state never changed, so we just show the error
+  //     toast.error(error.toString());
+  //   }
+  // };
 
   const fetchTabData = async (tab) => {
     setLoading(true);
@@ -344,14 +391,16 @@ export default function ProviderDashboard() {
                 </div>
               )}
               <div className="min-w-0">
-                <h3 className="font-bold text-slate-800 dark:text-white truncate">{user?.name}</h3>
+                <h3 className="font-bold text-slate-800 dark:text-white truncate">
+                  {user?.name}
+                </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">
                   {user?.role || "Provider"}
                 </p>
               </div>
             </div>
             {/* Availability Toggle */}
-            <button
+            {/* <button
               onClick={toggleAvailability}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-colors ${isAvailable ? "bg-green-50 dark:bg-success/20 text-green-700 dark:text-success border border-green-200 dark:border-success/30" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700"}`}
             >
@@ -362,7 +411,34 @@ export default function ProviderDashboard() {
                 {isAvailable ? "Available" : "Offline"}
               </span>
               <ToggleLeft className="w-4 h-4" />
-            </button>
+            </button>*/}
+            {/* <h1 className="text-lg">
+              {user?.isAvailable ? <>Available</> : <>Offline</>}
+            </h1>*/}
+            {/* <div className="flex items-center gap-2">
+              <span className="text-lg dark:text-white m-.5">
+                {user?.isAvailable ? <>Available</> : <>Offline</>}
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="isAvailable"
+                  checked={user?.isAvailable}
+                  onChange={toggleAvailability}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+              </label>
+            </div>*/}
+
+            <h1 className={`text-lg font-bold`}>
+              Now you are{" "}
+              <span
+                className={`font-bold ${user?.isAvailable ? "text-green-600" : "text-red-600"}`}
+              >
+                {user?.isAvailable ? <>Online</> : <>Offline</>}
+              </span>
+            </h1>
           </div>
 
           <nav className="flex-1 p-4 space-y-1">

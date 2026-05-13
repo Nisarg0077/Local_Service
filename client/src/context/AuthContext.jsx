@@ -5,13 +5,24 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { mockUsers, mockProviders } from "../data/mockData";
-import { generateMockToken, isTokenExpired } from "../utils";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-// import { CookiesProvider } from "react-cookie";
+import api from "../services/api";
 
 const AuthContext = createContext(null);
+
+// Helper to read browser cookie
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return JSON.parse(parts.pop().split(";")[0]);
+  return null;
+}
+
+// Helper to clear browser cookie
+function clearCookie(name) {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -19,145 +30,168 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Restore session on mount
+  // Validate session on mount - check browser cookie and validate with database
   useEffect(() => {
-    const storedToken = localStorage.getItem("slms_token");
-    const storedUser = localStorage.getItem("slms_user");
-    if (storedToken && storedUser && !isTokenExpired(storedToken)) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    } else {
-      localStorage.removeItem("slms_token");
-      localStorage.removeItem("slms_user");
-    }
-    setLoading(false);
+    const validateSession = async () => {
+      // 1. Check browser cookie first
+      const browserCookie = getCookie("slms_session");
+
+      if (!browserCookie || !browserCookie.uid) {
+        // No browser cookie - clear any stale localStorage
+        localStorage.removeItem("slms_token");
+        localStorage.removeItem("slms_user");
+        setLoading(false);
+        return;
+      }
+
+      // 2. Get stored token from localStorage
+      const storedToken = localStorage.getItem("slms_token");
+      const storedUser = localStorage.getItem("slms_user");
+
+      if (!storedToken) {
+        // Have cookie but no token - clear cookie and redirect
+        clearCookie("slms_session");
+        try {
+          await api.post("/userroutes/logout", { uid: browserCookie.uid });
+        } catch (e) {}
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // 3. Validate with backend (checks database for valid cookie < 7 days)
+        const res = await api.post("/userroutes/validate-cookie", {
+          token: storedToken,
+          uid: browserCookie.uid,
+        });
+
+        if (res.data.valid) {
+          // Valid session - restore user
+          const userData = storedUser ? JSON.parse(storedUser) : res.data.user;
+          const currentToken = res.data.newToken || storedToken;
+          if (res.data.newToken) {
+            localStorage.setItem("slms_token", res.data.newToken);
+          }
+          setToken(currentToken);
+          setUser(userData);
+        } else {
+          // Cookie invalid or expired - clean up both browser and database
+          clearCookie("slms_session");
+          localStorage.removeItem("slms_token");
+          localStorage.removeItem("slms_user");
+          // Notify backend to clear expired cookies
+          await api.post("/userroutes/logout", { uid: browserCookie.uid });
+        }
+      } catch (error) {
+        console.error("Session validation failed:", error);
+        clearCookie("slms_session");
+        localStorage.removeItem("slms_token");
+        localStorage.removeItem("slms_user");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    validateSession();
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    const userData = JSON.parse(localStorage.getItem("slms_user") || "{}");
+    const uid = userData?.uid;
+
+    if (uid) {
+      try {
+        await api.post("/userroutes/logout", { uid });
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
+    }
+
+    clearCookie("slms_session");
     localStorage.removeItem("slms_token");
     localStorage.removeItem("slms_user");
     setToken(null);
     setUser(null);
-  }, []);
+    navigate("/login");
+    toast.success("Logged out successfully");
+  }, [navigate]);
 
   // Auto logout on token expiry
   useEffect(() => {
     if (!token) return;
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    const msUntilExpiry = payload.exp * 1000 - Date.now();
-    if (msUntilExpiry <= 0) {
-      logout();
-      return;
-    }
-    const timer = setTimeout(
-      () => {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const msUntilExpiry = payload.exp * 1000 - Date.now();
+      if (msUntilExpiry <= 0) {
         logout();
-        toast.error("Session expired. Please log in again.");
-      },
-      Math.min(msUntilExpiry, 2147483647),
-    );
-    return () => clearTimeout(timer);
+        return;
+      }
+      const timer = setTimeout(
+        () => {
+          logout();
+          toast.error("Session expired. Please log in again.");
+        },
+        Math.min(msUntilExpiry, 2147483647),
+      );
+      return () => clearTimeout(timer);
+    } catch (error) {
+      logout();
+    }
   }, [token, logout]);
-
-  // const login = useCallback(async (email, password, role) => {
-  //   setLoading(true);
-  //   await new Promise(r => setTimeout(r, 1200)); // simulate API
-
-  //   // Check all user pools
-  //   const allUsers = [
-  //     ...mockUsers,
-  //     ...mockProviders.map(p => ({ ...p, role: 'provider' })),
-  //   ];
-  //   const found = allUsers.find(
-  //     u => u.email === email && u.password === password
-  //   );
-
-  //   if (!found) {
-  //     setLoading(false);
-  //     throw new Error('Invalid email or password.');
-  //   }
-
-  //   const { password: _pw, ...safeUser } = found;
-  //   const mockToken = generateMockToken(safeUser);
-
-  //   localStorage.setItem('slms_token', mockToken);
-  //   localStorage.setItem('slms_user', JSON.stringify(safeUser));
-  //   setToken(mockToken);
-  //   setUser(safeUser);
-  //   setLoading(false);
-  //   return safeUser;
-  // }, []);
 
   const login = useCallback(async (email, password) => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/api/userroutes/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await api.post("/userroutes/login", { email, password });
 
-      const data = await res.json();
-
-      if (!data.log) {
-        throw new Error(data.message || "Login failed");
+      if (!res.data.log) {
+        throw new Error(res.data.message || "Login failed");
       }
 
-      const user = data.user;
-      const token = data.token;
-
-      // cookies.set("slms_token", token, { path: "/" });
-      // cookies.set("slms_user", JSON.stringify(user), { path: "/" });
+      const user = res.data.user;
+      const token = res.data.token;
 
       localStorage.setItem("slms_token", token);
       localStorage.setItem("slms_user", JSON.stringify(user));
+      document.cookie = `slms_session=${JSON.stringify({
+        uid: user.uid,
+        token: token,
+        createdAt: new Date().toISOString(),
+      })}; max-age=${7 * 24 * 60 * 60}; path=/`;
 
       setToken(token);
       setUser(user);
 
       return user;
+    } catch (error) {
+      throw error;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const register = useCallback(async (formData) => {
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1400));
+  const register = useCallback(
+    async (formData) => {
+      setLoading(true);
 
-    const existsInUsers = mockUsers.find((u) => u.email === formData.email);
-    const existsInProviders = mockProviders.find(
-      (p) => p.email === formData.email,
-    );
-    if (existsInUsers || existsInProviders) {
-      setLoading(false);
-      throw new Error("Email already registered. Please login.");
-    }
+      try {
+        const res = await api.post("/userroutes/register", formData);
 
-    const newUser = {
-      uid: formData.uid,
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      phone: formData.phone || "",
-      role: formData.role || "customer",
-      avatar: `https://i.pravatar.cc/150?u=${formData.email}`,
-      address: "",
-      joinedAt: new Date().toISOString(),
-      favorites: [],
-    };
+        if (!res.data.reg) {
+          throw new Error(res.data.message || "Registration failed");
+        }
 
-    const mockToken = generateMockToken(newUser);
-    localStorage.setItem("slms_token", mockToken);
-    localStorage.setItem("slms_user", JSON.stringify(newUser));
-    setToken(mockToken);
-    setUser(newUser);
-    setLoading(false);
-    return newUser;
-  }, []);
+        toast.success("Registration successful! Please login.");
+        navigate("/login");
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [navigate],
+  );
 
   const updateUser = useCallback(
     (updates) => {
