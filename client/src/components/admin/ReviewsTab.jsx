@@ -95,10 +95,10 @@ export default function ReviewsTab({ reviews, onDelete }) {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {reviews.length === 0 ? (
                 <tr><td colSpan="5" className="text-center py-8 text-slate-500">No approved reviews found.</td></tr>
-              ) : reviews.map(r => {
+              ) : reviews.map((r, i) => {
                 const userData = usersMap[r.userId];
                 return (
-                  <tr key={r._id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                  <tr key={r._id || `review-${i}`} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                     <td className="px-4 md:px-6 py-3 md:py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-500 font-bold overflow-hidden shrink-0">

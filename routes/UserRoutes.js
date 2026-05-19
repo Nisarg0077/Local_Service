@@ -6,6 +6,15 @@ const Cookie = require("../models/Cookie");
 const jwt = require("jsonwebtoken");
 const upload = require("../middleware/upload");
 
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 // Register
 router.post("/register", upload.single("avatar"), async (req, res) => {
   try {
@@ -304,7 +313,7 @@ router.post("/validate-cookie", async (req, res) => {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const cookie = await Cookie.findOne({
       uid: uid,
-      createdAt: { $gte: sevenDaysAgo }
+      createdAt: { $gte: sevenDaysAgo },
     }).sort({ createdAt: -1 });
 
     if (!cookie) {

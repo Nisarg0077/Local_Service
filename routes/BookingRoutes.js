@@ -35,44 +35,43 @@ const mongoose = require("mongoose");
 //     }
 // });
 
-
 router.post("/", async (req, res) => {
+  try {
+    // console.log(req.body);
+    const booking = new Bookings({
+      bookingId: req.body.bookingId,
+      customerId: req.body.customerId,
+      providerId: req.body.providerId,
+      serviceId: req.body.serviceId,
+      date: req.body.date,
+      time: req.body.time,
+      address: req.body.address,
+      note: req.body.note,
+      amount: req.body.amount,
+      status: "Pending",
+    });
+
+    // console.log(booking)
+    await booking.save();
+
+    // Send Email Notification to Customer
     try {
-        // console.log(req.body);
-        const booking = new Bookings({
-            bookingId: req.body.bookingId,
-            customerId: req.body.customerId,
-            providerId: req.body.providerId,
-            serviceId: req.body.serviceId,
-            date: req.body.date,
-            time: req.body.time,
-            address: req.body.address,
-            note: req.body.note,
-            amount: req.body.amount,
-            status: "Pending"
-        });
+      // Safer lookups to avoid CastError with custom IDs
+      let customer = await User.findOne({ uid: booking.customerId });
+      if (!customer && mongoose.Types.ObjectId.isValid(booking.customerId)) {
+        customer = await User.findById(booking.customerId);
+      }
 
-        // console.log(booking)
-        await booking.save();
+      let provider = await Provider.findOne({ providerId: booking.providerId });
+      if (!provider && mongoose.Types.ObjectId.isValid(booking.providerId)) {
+        provider = await Provider.findById(booking.providerId);
+      }
 
-        // Send Email Notification to Customer
-        try {
-            // Safer lookups to avoid CastError with custom IDs
-            let customer = await User.findOne({ uid: booking.customerId });
-            if (!customer && mongoose.Types.ObjectId.isValid(booking.customerId)) {
-                customer = await User.findById(booking.customerId);
-            }
+      const service = await Service.findOne({ id: booking.serviceId });
 
-            let provider = await Provider.findOne({ providerId: booking.providerId });
-            if (!provider && mongoose.Types.ObjectId.isValid(booking.providerId)) {
-                provider = await Provider.findById(booking.providerId);
-            }
-
-            const service = await Service.findOne({ id: booking.serviceId });
-
-            if (customer && customer.email) {
-                const subject = `Booking Confirmation - ${service ? service.title : "Service"}`;
-                const htmlContent = `
+      if (customer && customer.email) {
+        const subject = `Booking Confirmation - ${service ? service.title : "Service"}`;
+        const htmlContent = `
                     <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; line-height: 1.6;">
                         <h2 style="color: #4CAF50;">Booking Confirmed!</h2>
                         <p>Hi <strong>${customer.name}</strong>,</p>
@@ -89,61 +88,73 @@ router.post("/", async (req, res) => {
                         <p>Best regards,<br><strong>Smart Local Service Team</strong></p>
                     </div>
                 `;
-                await sendEmail(customer.email, subject, htmlContent);
-            }
-        } catch (emailError) {
-            console.error("Email notification failed:", emailError);
-        }
-
-        res.json(booking);
-    } catch (error) {
-        console.log(error);
-        res.status(500).send("Server error");
+        await sendEmail(customer.email, subject, htmlContent);
+      }
+    } catch (emailError) {
+      console.error("Email notification failed:", emailError);
     }
+
+    res.json(booking);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
 });
 
 router.get("/", async (req, res) => {
-    const bookings = await Bookings.find();
-    res.json(bookings);
+  const bookings = await Bookings.find();
+  res.json(bookings);
 });
 
-
 router.get("/user/:id", async (req, res) => {
-    try {
-        const bookings = await Bookings.find({ customerId: req.params.id }).sort({ createdAt: -1 });
-        res.json(bookings);
-    } catch (error) {
-        console.log(error);
-        res.status(500).send("Server error");
-    }
+  try {
+    const bookings = await Bookings.find({ customerId: req.params.id }).sort({
+      createdAt: -1,
+    });
+    res.json(bookings);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Server error");
+  }
 });
 
 router.put("/:id", async (req, res) => {
-    try {
-        const { status } = req.body;
-        const booking = await Bookings.findByIdAndUpdate(req.params.id, { status }, { new: true });
+  try {
+    const { status } = req.body;
+    const booking = await Bookings.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true },
+    );
 
-        // Send Status Update Email to Customer
-        if (booking) {
-            try {
-                // Safer lookups to avoid CastError with custom IDs
-                let customer = await User.findOne({ uid: booking.customerId });
-                if (!customer && mongoose.Types.ObjectId.isValid(booking.customerId)) {
-                    customer = await User.findById(booking.customerId);
-                }
+    // Send Status Update Email to Customer
+    if (booking) {
+      try {
+        // Safer lookups to avoid CastError with custom IDs
+        let customer = await User.findOne({ uid: booking.customerId });
+        if (!customer && mongoose.Types.ObjectId.isValid(booking.customerId)) {
+          customer = await User.findById(booking.customerId);
+        }
 
-                let provider = await Provider.findOne({ providerId: booking.providerId });
-                if (!provider && mongoose.Types.ObjectId.isValid(booking.providerId)) {
-                    provider = await Provider.findById(booking.providerId);
-                }
+        let provider = await Provider.findOne({
+          providerId: booking.providerId,
+        });
+        if (!provider && mongoose.Types.ObjectId.isValid(booking.providerId)) {
+          provider = await Provider.findById(booking.providerId);
+        }
 
-                const service = await Service.findOne({ id: booking.serviceId });
+        const service = await Service.findOne({ id: booking.serviceId });
 
-                if (customer && customer.email) {
-                    const subject = `Booking Status Updated: ${status}`;
-                    const statusColor = status === "Cancelled" || status === "Rejected" ? "#f44336" : status === "Accepted" ? "#4CAF50" : "#2196F3";
+        if (customer && customer.email) {
+          const subject = `Booking Status Updated: ${status}`;
+          const statusColor =
+            status === "Cancelled" || status === "Rejected"
+              ? "#f44336"
+              : status === "Accepted"
+                ? "#4CAF50"
+                : "#2196F3";
 
-                    const htmlContent = `
+          const htmlContent = `
                         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; line-height: 1.6;">
                             <h2 style="color: ${statusColor};">Booking Status Updated</h2>
                             <p>Hi <strong>${customer.name}</strong>,</p>
@@ -158,18 +169,18 @@ router.put("/:id", async (req, res) => {
                             <p>Best regards,<br><strong>Smart Local Service Team</strong></p>
                         </div>
                     `;
-                    await sendEmail(customer.email, subject, htmlContent);
-                }
-            } catch (emailError) {
-                console.error("Status update email failed:", emailError);
-            }
+          await sendEmail(customer.email, subject, htmlContent);
         }
-
-        res.json(booking);
-    } catch (e) {
-        console.log(e);
-        res.status(500).send("Server error");
+      } catch (emailError) {
+        console.error("Status update email failed:", emailError);
+      }
     }
+
+    res.json(booking);
+  } catch (e) {
+    console.log(e);
+    res.status(500).send("Server error");
+  }
 });
 
 // router.get("/provider/:id", async (req, res) => {
@@ -178,23 +189,59 @@ router.put("/:id", async (req, res) => {
 //     res.json(bookings);
 // });
 
-
 router.get("/provider/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-        // console.log("Provider ID:", id);
+    // console.log("Provider ID:", id);
 
-        const bookings = await Bookings.find({ providerId: id }).sort({ createdAt: -1 });
+    const bookings = await Bookings.find({ providerId: id }).sort({
+      createdAt: -1,
+    });
 
-        // console.log("Bookings:", bookings);
+    // console.log("Bookings:", bookings);
 
-        res.status(200).json(bookings);
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+router.delete("/:id", async (req, res) => {
+  try {
+    const booking = await Bookings.findByIdAndDelete(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
     }
+    res.json({ message: "Booking deleted successfully", booking });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting booking", error: error.message });
+  }
+});
+
+router.delete("/:providerId", async (req, res) => {
+  try {
+    let provider;
+    if (req.params.providerId.match(/^[0-9a-fA-F]{24}$/)) {
+      provider = await Provider.findByIdAndDelete(req.params.providerId);
+    }
+    if (!provider) {
+      provider = await Provider.findOneAndDelete({
+        providerId: req.params.providerId,
+      });
+    }
+    if (!provider) {
+      return res.status(404).json({ message: "Provider not found" });
+    }
+    res.json({ message: "Provider deleted successfully", provider });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting provider", error: error.message });
+  }
 });
 
 module.exports = router;

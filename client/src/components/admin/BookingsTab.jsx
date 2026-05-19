@@ -38,9 +38,9 @@ export default function BookingsTab({ bookings, onDelete }) {
                   </td>
                 </tr>
               ) : (
-                bookings.map((b) => (
+                bookings.map((b, i) => (
                   <tr
-                    key={b._id}
+                    key={b._id || b.bookingId || `booking-${i}`}
                     className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
                   >
                     <td className="px-6 py-4 font-mono text-xs text-indigo-600 dark:text-indigo-400">

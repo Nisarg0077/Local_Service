@@ -9,7 +9,9 @@ export default function CategoriesTab({ categories, onDelete, onSave }) {
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this category?")) {
+      console.log();
       onDelete("categories", id);
+
       toast.success("Category deleted successfully");
     }
   };
@@ -49,8 +51,12 @@ export default function CategoriesTab({ categories, onDelete, onSave }) {
           <table className="w-full text-sm text-left min-w-[400px]">
             <thead className="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 capitalize">
               <tr>
-                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">Category Name</th>
-                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold text-center">Actions</th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold">
+                  Category Name
+                </th>
+                <th className="px-4 md:px-6 py-3 md:py-4 font-semibold text-center">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -61,9 +67,9 @@ export default function CategoriesTab({ categories, onDelete, onSave }) {
                   </td>
                 </tr>
               ) : (
-                categories.map((c) => (
+                categories.map((c, i) => (
                   <tr
-                    key={c._id}
+                    key={c._id || `category-${i}`}
                     className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
                   >
                     <td className="px-4 md:px-6 py-3 md:py-4 font-bold text-slate-800 dark:text-white">

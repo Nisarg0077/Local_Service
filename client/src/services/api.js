@@ -70,7 +70,7 @@ export const bookingsAPI = {
     return api.post("/bookings/", data);
     console.log(data);
   },
-  getMyBookings: () => api.get("/bookings/my"),
+  getAll: () => api.get("/bookings/"),
   getByUser: (userId) => api.get(`/bookings/user/${userId}`),
   getById: (id) => api.get(`/bookings/${id}`),
   cancel: (id) => api.patch(`/bookings/${id}/cancel`),
@@ -78,6 +78,7 @@ export const bookingsAPI = {
 };
 
 export const usersAPI = {
+  getAll: () => api.get("/userroutes/"),
   getProfile: () => api.get("/userroutes/profile"),
   updateProfile: (data) => api.put("/userroutes/profile", data),
   getFavorites: (userId) => api.get(`/userroutes/favorites/${userId}`),
@@ -98,6 +99,7 @@ export const providerAPI = {
   getProvider: (providerId) => api.get(`/providers/${providerId}`),
   updateProvider: (providerId, data) =>
     api.put(`/providers/${providerId}`, data),
+  delete: (providerId) => api.delete(`/providers/${providerId}`),
 };
 
 export const adminAPI = {

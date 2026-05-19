@@ -15,7 +15,14 @@ import {
   Database,
   CheckCircle,
 } from "lucide-react";
-import api from "../../services/api";
+import api, {
+  bookingsAPI,
+  categoriesAPI,
+  providerAPI,
+  reviewsAPI,
+  servicesAPI,
+  usersAPI,
+} from "../../services/api";
 import toast from "react-hot-toast";
 
 // Import our new subcomponents
@@ -119,22 +126,53 @@ export default function AdminDashboard() {
   };
 
   const fetchServices = async () => {
-    try { const res = await api.get("/services"); setServices(res.data); } catch (e) { toast.error("Failed to fetch services"); }
+    try {
+      const res = await servicesAPI.getAll();
+      setServices(res.data);
+    } catch (e) {
+      toast.error("Failed to fetch services");
+    }
   };
   const fetchProviders = async () => {
-    try { const res = await api.get("/providers"); setProviders(res.data); } catch (e) { toast.error("Failed to fetch providers"); }
+    try {
+      const res = await providerAPI.getAll();
+      // console.log(res.data);
+      setProviders(res.data);
+    } catch (e) {
+      toast.error("Failed to fetch providers");
+    }
   };
   const fetchUsers = async () => {
-    try { const res = await api.get("/userroutes"); setUsers(res.data); } catch (e) { toast.error("Failed to fetch users"); }
+    try {
+      const res = await usersAPI.getAll();
+      setUsers(res.data);
+    } catch (e) {
+      toast.error("Failed to fetch users");
+    }
   };
   const fetchBookings = async () => {
-    try { const res = await api.get("/bookings"); setBookings(res.data); } catch (e) { toast.error("Failed to fetch bookings"); }
+    try {
+      const res = await bookingsAPI.getAll();
+      setBookings(res.data);
+    } catch (e) {
+      toast.error("Failed to fetch bookings");
+    }
   };
   const fetchReviews = async () => {
-    try { const res = await api.get("/reviews/approved"); setReviews(res.data); } catch (e) { toast.error("Failed to fetch reviews"); }
+    try {
+      const res = await reviewsAPI.getApproved();
+      setReviews(res.data);
+    } catch (e) {
+      toast.error("Failed to fetch reviews");
+    }
   };
   const fetchCategories = async () => {
-    try { const res = await api.get("/categories"); setCategories(res.data); } catch (e) { toast.error("Failed to fetch categories"); }
+    try {
+      const res = await categoriesAPI.getAll();
+      setCategories(res.data);
+    } catch (e) {
+      toast.error("Failed to fetch categories");
+    }
   };
 
   const handleCategorySave = () => {

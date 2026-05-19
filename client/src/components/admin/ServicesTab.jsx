@@ -41,8 +41,8 @@ export default function ServicesTab({ services, onDelete }) {
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {services.length === 0 ? (
                 <tr><td colSpan="6" className="text-center py-8 text-slate-500">No services found.</td></tr>
-              ) : services.map(s => (
-                <tr key={s._id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+              ) : services.map((s, i) => (
+                <tr key={s._id || `service-${i}`} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                   <td className="px-4 md:px-6 py-3 md:py-4">
                     <div className="flex items-center gap-3">
                       {s.image ? (
