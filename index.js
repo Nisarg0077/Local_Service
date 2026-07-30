@@ -39,6 +39,31 @@ app.use("/api/notification", notificationRoutes);
 const reviewRoutes = require("./routes/ReviewRoutes");
 app.use("/api/reviews", reviewRoutes);
 
+//MIGRATION APIs
+
+const migration = require("./migration/migration");
+app.get("/api/migration/:collectionName", async (req, res) => {
+  let { collectionName } = req.params;
+
+  collectionName =
+    collectionName.charAt(0).toUpperCase() + collectionName.slice(1);
+
+  try {
+    const result = await migration(collectionName);
+
+    res.json({
+      success: true,
+      collection: collectionName,
+      ...result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+});
+
 // TEST ROUTE
 app.get("/", (req, res) => {
     res.send("API running");

@@ -24,7 +24,7 @@ export default function ProfileTab() {
     setLoading(true);
     try {
       // Use the specific provider lookup if it's a provider
-      const id = user?.uid || user?.providerId || user?._id;
+      const id = user?.uid;
       const res = await providerAPI.getProvider(id);
       setExtraData(res.data);
     } catch (err) {

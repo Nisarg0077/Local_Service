@@ -1,6 +1,6 @@
 [
   {
-    "_id": "r1",
+    "id": "r1",
     "serviceId": 101,
     "userId": "u1",
     "userName": "Rahul V.",
@@ -10,7 +10,7 @@
     "date": "2024-03-10T00:00:00Z"
   },
   {
-    "_id": "r2",
+    "id": "r2",
     "serviceId": 101,
     "userId": "u2",
     "userName": "Priya S.",
@@ -20,7 +20,7 @@
     "date": "2024-04-05T00:00:00Z"
   },
   {
-    "_id": "r3",
+    "id": "r3",
     "serviceId": 103,
     "userId": "u1",
     "userName": "Rahul V.",
@@ -30,7 +30,7 @@
     "date": "2024-02-20T00:00:00Z"
   },
   {
-    "_id": "r4",
+    "id": "r4",
     "serviceId": 103,
     "userId": "u2",
     "userName": "Priya S.",
@@ -40,7 +40,7 @@
     "date": "2024-04-10T00:00:00Z"
   },
   {
-    "_id": "r5",
+    "id": "r5",
     "serviceId": 104,
     "userId": "u1",
     "userName": "Rahul V.",

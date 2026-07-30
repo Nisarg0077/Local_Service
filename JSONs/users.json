@@ -1,6 +1,6 @@
 [
   {
-    "_id": "u1",
+    "uid": "u1",
     "name": "Rahul Verma",
     "email": "rahul@demo.com",
     "password": "Demo@123",
@@ -12,7 +12,7 @@
     "favorites": [101, 103, 105]
   },
   {
-    "_id": "u2",
+    "uid": "u2",
     "name": "Priya Shah",
     "email": "priya@demo.com",
     "password": "Demo@123",
@@ -24,7 +24,7 @@
     "favorites": [102]
   },
   {
-    "_id": "u3",
+    "uid": "u3",
     "name": "Admin User",
     "email": "admin@demo.com",
     "password": "Admin@123",

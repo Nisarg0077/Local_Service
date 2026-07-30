@@ -84,13 +84,15 @@ function LeaveReviewModal({ booking, service, user, onClose, onSubmitted }) {
     }
     setLoading(true);
     try {
-      await reviewsAPI.create({
+
+      const data = {
         serviceId: String(booking.serviceId),
         userId: user?.uid || user?.id || user?._id,
         userName: user?.name || "Anonymous",
         rating,
         comment: comment.trim(),
-      });
+      }
+      await reviewsAPI.create(data);
       toast.success(
         "Review submitted! It will be visible after admin approval.",
       );

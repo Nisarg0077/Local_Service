@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 
 const providerSchema = new mongoose.Schema({
+  uid: String,
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: "User",
   },
 

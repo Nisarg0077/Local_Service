@@ -1,6 +1,6 @@
 [
   {
-    "_id": "p1",
+    "uid": "p1",
     "userId": "prov1",
     "name": "Aryan Sharma",
     "email": "aryan@demo.com",
@@ -8,7 +8,6 @@
     "business": "Aryan Electricals",
     "category": "Electrician",
     "rating": 4.8,
-    "reviews": 120,
     "experience": 5,
     "area": "Delhi South",
     "avatar": "https://i.pravatar.cc/150?u=p1",
@@ -20,7 +19,7 @@
     "joinedAt": "2022-03-15T00:00:00Z"
   },
   {
-    "_id": "p2",
+    "uid": "p2",
     "userId": "prov2",
     "name": "Vikram Singh",
     "email": "vikram@demo.com",
@@ -40,7 +39,7 @@
     "joinedAt": "2022-01-20T00:00:00Z"
   },
   {
-    "_id": "p3",
+    "uid": "p3",
     "userId": "prov3",
     "name": "Neha Joshi",
     "email": "neha@demo.com",
@@ -60,7 +59,7 @@
     "joinedAt": "2022-05-10T00:00:00Z"
   },
   {
-    "_id": "p4",
+    "uid": "p4",
     "userId": "prov4",
     "name": "Suresh Kumar",
     "email": "suresh@demo.com",
@@ -80,7 +79,7 @@
     "joinedAt": "2021-11-05T00:00:00Z"
   },
   {
-    "_id": "p5",
+    "uid": "p5",
     "userId": "prov5",
     "name": "Mohan Lal",
     "email": "mohan@demo.com",
@@ -100,7 +99,7 @@
     "joinedAt": "2022-08-01T00:00:00Z"
   },
   {
-    "_id": "p6",
+    "uid": "p6",
     "userId": "prov6",
     "name": "Deepak Carpenter",
     "email": "deepak@demo.com",
@@ -120,7 +119,7 @@
     "joinedAt": "2021-06-15T00:00:00Z"
   },
   {
-    "_id": "p7",
+    "uid": "p7",
     "userId": "prov7",
     "name": "Rajan Pest Control",
     "email": "rajan@demo.com",
@@ -140,7 +139,7 @@
     "joinedAt": "2023-02-20T00:00:00Z"
   },
   {
-    "_id": "p8",
+    "uid": "p8",
     "userId": "prov8",
     "name": "Ananya Repairs",
     "email": "ananya@demo.com",
