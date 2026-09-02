@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { usersAPI, providerAPI } from '../../services/api';
 import toast from 'react-hot-toast';
-import { Save, User, Mail, Phone, MapPin, ToggleLeft } from 'lucide-react';
+import { Save, User, Mail, Phone, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 

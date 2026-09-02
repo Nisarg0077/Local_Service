@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  Users, UserCheck, FileText, TrendingUp, Activity, AlertTriangle, Download,
-  Server, Database, CheckCircle, ChevronRight
+  Users, UserCheck, FileText, TrendingUp, Activity, AlertTriangle,
+  Server, CheckCircle, ChevronRight
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   CartesianGrid, PieChart, Pie, Cell
 } from 'recharts';
 import { formatCurrency } from '../../utils';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 
 const COLORS = ['#10B981', '#4F46E5', '#06B6D4', '#F59E0B', '#EF4444', '#8B5CF6'];
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  User, Mail, Phone, MapPin, Calendar, Star,
-  CheckCircle, DollarSign, Edit, ShieldCheck
+  Mail, Phone, MapPin, Calendar,
+  CheckCircle, Edit, ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { providerAPI } from '../../services/api';

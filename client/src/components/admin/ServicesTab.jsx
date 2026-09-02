@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Edit, Plus, Star } from 'lucide-react';
+import { Trash2, Edit, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function ServicesTab({ services, onDelete }) {

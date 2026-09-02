@@ -1,6 +1,5 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { categories } from "../data/mockData";
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -67,7 +66,6 @@ export const servicesAPI = {
 export const bookingsAPI = {
   create: (data) => {
     return api.post("/bookings/", data);
-    console.log(data);
   },
   getAll: () => api.get("/bookings/"),
   getByUser: (userId) => api.get(`/bookings/user/${userId}`),
