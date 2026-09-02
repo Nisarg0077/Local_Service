@@ -40,7 +40,7 @@ const reviewRoutes = require("./routes/ReviewRoutes");
 app.use("/api/reviews", reviewRoutes);
 
 //MIGRATION APIs
-
+/*
 const migration = require("./migration/migration");
 app.get("/api/migration/:collectionName", async (req, res) => {
   let { collectionName } = req.params;
@@ -63,7 +63,7 @@ app.get("/api/migration/:collectionName", async (req, res) => {
     });
   }
 });
-
+*/
 // TEST ROUTE
 app.get("/", (req, res) => {
     res.send("API running");
