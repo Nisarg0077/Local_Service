@@ -39,6 +39,9 @@ export default function ServicesList() {
   const [categories, setCategories] = useState([]);
   const [provider, setProvider] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const debouncedSearch = useDebounce(searchInput, 400);
 
   useEffect(() => {
@@ -125,6 +128,7 @@ export default function ServicesList() {
         }
         // console.log(services)
         setDisplayedServices(services);
+        setCurrentPage(1);
       } catch (error) {
         console.error("Failed to fetch services", error);
       }
@@ -143,6 +147,7 @@ export default function ServicesList() {
     setSortBy("rating");
     setPriceRange(null);
     setMinRating(0);
+    setCurrentPage(1);
   };
 
   const activeFilterCount = [
@@ -152,11 +157,21 @@ export default function ServicesList() {
     sortBy !== "rating",
   ].filter(Boolean).length;
 
+  const totalPages = Math.ceil(displayedServices.length / itemsPerPage);
+  const currentServices = displayedServices.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
-    <div className="min-h-screen dark:bg-slate-900 pb-20">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900 pb-20 transition-colors duration-300">
       {/* Header */}
-      <div className="bg-gradient-to-br from-indigo-900 via-primary to-indigo-700 py-14 px-6">
-        <div className="max-w-4xl mx-auto">
+      <div className="bg-gradient-to-br from-indigo-900 via-primary to-indigo-700 dark:from-slate-900 dark:via-indigo-900 dark:to-slate-900 py-14 px-6 relative overflow-hidden">
+        {/* Optional background decorations */}
+        <div className="absolute inset-0 hero-pattern opacity-10 dark:opacity-30" />
+        <div className="absolute top-20 right-20 w-72 h-72 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative max-w-4xl mx-auto">
           <h1 className="text-3xl md:text-4xl font-heading font-bold text-white mb-3 text-center">
             Find Your Service
           </h1>
@@ -164,7 +179,7 @@ export default function ServicesList() {
             {displayedServices.length}+ professionals ready to help you today
           </p>
           {/* Search */}
-          <div className="flex gap-2 bg-white dark:bg-slate-800 rounded-2xl p-2 shadow-2xl max-w-2xl mx-auto">
+          <div className="flex gap-2 transition-all bg-white/30 focus-within:bg-white/40 dark:bg-slate-800/40 dark:focus-within:bg-slate-800/60 backdrop-blur-md border border-white/20 dark:border-slate-700/50 rounded-2xl p-2 shadow-xl max-w-xl focus-within:max-w-2xl mx-auto">
             <div className="flex-1 flex items-center gap-2 px-3">
               <Search className="w-5 h-5 text-slate-400 shrink-0" />
               <input
@@ -172,7 +187,7 @@ export default function ServicesList() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search services, e.g. AC Repair..."
-                className="flex-1 bg-transparent outline-none text-slate-800 dark:text-white placeholder:text-slate-400 text-sm"
+                className="flex-1 bg-transparent outline-none text-black dark:text-white placeholder:text-slate-500  font-bold text-sm"
                 aria-label="Search services"
               />
               {searchInput && (
@@ -194,7 +209,7 @@ export default function ServicesList() {
           {/* Filter Toggle */}
           <button
             onClick={() => setShowFilters((o) => !o)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-all ${showFilters ? "border-primary bg-primary text-white" : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary"}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-all ${showFilters ? "border-primary bg-red-500 text-white" : "bg-blue-900 border-slate-200 dark:border-slate-700 text-white dark:text-slate-300 hover:border-primary"}`}
           >
             <SlidersHorizontal className="w-4 h-4" />
             Filters
@@ -212,10 +227,10 @@ export default function ServicesList() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none pl-3 pr-8 py-2 rounded-xl text-sm font-semibold border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:border-primary outline-none cursor-pointer"
+              className="appearance-none pl-3 pr-8 py-2 rounded-xl text-sm font-semibold border-2 border-slate-200 dark:border-slate-700/50 bg-white backdrop-blur-sm dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 focus:border-primary outline-none cursor-pointer"
             >
               {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
+                <option key={o.value} value={o.value} >
                   {o.label}
                 </option>
               ))}
@@ -248,7 +263,7 @@ export default function ServicesList() {
 
         {/* Filter Panel */}
         {showFilters && (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 p-6 mb-6 animate-slide-up shadow-card">
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-lg rounded-2xl border border-white/50 dark:border-slate-700/50 p-6 mb-6 animate-slide-up shadow-card">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Price Range */}
               <div>
@@ -316,7 +331,7 @@ export default function ServicesList() {
         <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
           <button
             onClick={() => setActiveCategory("All")}
-            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-colors shrink-0 ${activeCategory === "All" ? "bg-slate-800 dark:bg-white text-white dark:text-slate-800 shadow-md" : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary"}`}
+            className={`whitespace-nowrap px-4 py-2 mt-2 ml-1 rounded-full text-sm font-semibold transition-all hover:scale-105 shrink-0 ${activeCategory === "All" ? "bg-slate-800/80 dark:bg-white/90 backdrop-blur-md text-white dark:text-slate-800 shadow-md" : "bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:border-primary"}`}
           >
             All Services
           </button>
@@ -324,7 +339,7 @@ export default function ServicesList() {
             <button
               key={cat.name}
               onClick={() => setActiveCategory(cat.name)}
-              className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-semibold transition-colors shrink-0 ${activeCategory === cat ? "bg-slate-800 dark:bg-white text-white dark:text-slate-800 shadow-md" : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary"}`}
+              className={`whitespace-nowrap px-4 py-2 ml-1 mt-2 rounded-full text-sm font-semibold transition-all hover:scale-110 shrink-0 ${activeCategory === cat.name ? "bg-slate-800/80 dark:bg-white/90 backdrop-blur-md text-white dark:text-slate-800 shadow-md" : "bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:border-primary/60"}`}
             >
               {cat.name}
             </button>
@@ -340,27 +355,63 @@ export default function ServicesList() {
               <SkeletonCard key={i} />
             ))}
           </div>
-        ) : displayedServices.length > 0 ? (
-          <div
-            className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 max-w-3xl"}`}
-          >
-            {displayedServices.map((service) => {
-              const serviceProvider = provider.find(
-                (p) =>
-                  String(p.id) === String(service.providerId) ||
-                  String(p.providerId) === String(service.providerId),
-              );
-              console.log(serviceProvider);
+        ) : currentServices.length > 0 ? (
+          <>
+            <div
+              className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "w-full flex justify-center"}`}
+            >
+              {currentServices.map((service) => {
+                const serviceProvider = provider.find(
+                  (p) =>
+                    String(p.id) === String(service.providerId) ||
+                    String(p.providerId) === String(service.providerId),
+                );
+                // console.log(serviceProvider);
 
-              return (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  provider={serviceProvider}
-                />
-              );
-            })}
-          </div>
+                return (
+                  <ServiceCard
+                    key={service.id}
+                    service={service}
+                    provider={serviceProvider}
+                  />
+                );
+              })}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-12">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white/60 dark:bg-slate-800/60 backdrop-blur-md text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <div className="flex gap-1 overflow-x-auto max-w-[200px] sm:max-w-none scrollbar-hide">
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`w-10 h-10 shrink-0 rounded-xl text-sm font-semibold transition-all ${currentPage === i + 1
+                        ? "bg-primary text-white shadow-md"
+                        : "bg-white/60 dark:bg-slate-800/60 backdrop-blur-md text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
+                        }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold transition-all bg-white/60 dark:bg-slate-800/60 backdrop-blur-md text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-24">
             <div className="text-6xl mb-4">🔍</div>

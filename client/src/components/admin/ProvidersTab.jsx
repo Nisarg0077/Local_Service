@@ -12,7 +12,7 @@ export default function ProvidersTab({ providers, onDelete }) {
   };
 
   return (
-    <div className="animate-fade-in p-4">
+    <div className="animate-fade-in p-.5">
       <h1 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white">
         Provider Management
       </h1>

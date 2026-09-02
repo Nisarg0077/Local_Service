@@ -11,7 +11,7 @@ export default function UsersTab({ users, onDelete }) {
   };
 
   return (
-    <div className="animate-fade-in p-4">
+    <div className="animate-fade-in p-.4">
       <h1 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white">
         User Management
       </h1>

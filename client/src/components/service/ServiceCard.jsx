@@ -72,7 +72,7 @@ export default function ServiceCard({ service, provider }) {
     }
   };
   return (
-    <div className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 flex flex-col border border-slate-100 dark:border-slate-700">
+    <div className="group border-2 border-slate-300 dark:border-slate-700 bg-white/60 dark:bg-slate-600/60 rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 flex flex-col">
 
       {/* Image */}
       <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-700">
@@ -99,8 +99,8 @@ export default function ServiceCard({ service, provider }) {
         <button
           onClick={handleFavorite}
           className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-md ${isFavorited
-            ? 'bg-danger text-white scale-110'
-            : 'bg-white/90 dark:bg-slate-800/90 text-slate-400 hover:text-danger hover:scale-110'
+            ? 'bg-red-600/75 text-white scale-110'
+            : 'bg-white/70 dark:bg-slate-800/70 text-slate-400 hover:text-red-600/75 hover:scale-110'
             }`}
           aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
         >
@@ -108,7 +108,7 @@ export default function ServiceCard({ service, provider }) {
         </button>
 
         {/* Category pill */}
-        <span className="absolute bottom-3 left-3 px-2.5 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-xs font-bold text-primary rounded-full">
+        <span className="absolute bottom-3 left-3 px-2.5 py-1 border border-indigo-600/60 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-sm font-bold text-blue-600 rounded-full">
           {service.category}
         </span>
 
@@ -163,7 +163,7 @@ export default function ServiceCard({ service, provider }) {
         </div>
 
         {/* Description */}
-        <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 flex-1">
+        <p className="text-xs text-black dark:text-white line-clamp-2 mb-4 flex-1">
           {service.description}
         </p>
 
@@ -185,7 +185,7 @@ export default function ServiceCard({ service, provider }) {
                 <Link
                   to={`/services/${service.id}`}
                   state={{ service, provider }}
-                  className="px-3 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-all active:scale-95 whitespace-nowrap"
+                  className="px-3 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-gray-600 dark:border-slate-200 text-[10px] font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-all active:scale-95 whitespace-nowrap"
                 >
                   View Details
                 </Link>
@@ -193,7 +193,7 @@ export default function ServiceCard({ service, provider }) {
                 <Link
                   to={`/services/${service.id}`}
                   state={{ service, provider, autoBook: true }}
-                  className="px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition-all hover:shadow-glow active:scale-95"
+                  className="px-4 py-2 bg-primary/75 text-white text-xs font-bold rounded-xl hover:bg-indigo-700/75 transition-all hover:shadow-glow active:scale-100"
                 >
                   Book Now
                 </Link>
