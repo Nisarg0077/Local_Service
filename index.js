@@ -4,7 +4,7 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 
-app.use(cors());
+app.use(cors({origin: "*"}));
 app.use(express.json());
 
 // Serve static files from uploads folder
