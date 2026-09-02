@@ -4,7 +4,7 @@ const router = express.Router();
 
 const collections = {
   User: {
-    model: require("../models/User"),
+    model: require("../models/user"),
     data: require("../jsons/users.json"),
   },
   Provider: {

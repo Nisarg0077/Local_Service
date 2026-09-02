@@ -77,7 +77,7 @@ router.post("/login", async (req, res) => {
     if (!userObj.uid) userObj.uid = userObj.providerId || "";
   }
 
-  console.log("Logging in user:", userObj);
+  // console.log("Logging in user:", userObj);
 
   // Check for existing valid cookie (less than 7 days old)
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);

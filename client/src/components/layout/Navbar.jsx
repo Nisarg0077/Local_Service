@@ -96,7 +96,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`sticky top-0 z-[999] transition-all duration-300 ${scrolled ? "bg-white/95 dark:bg-slate-900/95 shadow-md" : "bg-white/80 dark:bg-slate-900/80"} backdrop-blur-md border-b border-slate-200/80 dark:border-slate-700/80`}
+      className={`sticky top-0 z-[999] transition-all duration-300 ${scrolled ? "bg-white/40 dark:bg-slate-900/40 shadow-md" : "bg-white/40 dark:bg-slate-900/40"} backdrop-blur-lg border-b border-slate-200/25 dark:border-slate-700/25`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
@@ -109,7 +109,7 @@ export default function Navbar() {
             <Zap className="w-4 h-4 text-white" />
           </div>
           <span className="text-xl font-heading font-bold text-slate-900 dark:text-white">
-            Smart<span className="text-primary">Local</span>
+            Smart<span className="text-primary font-bold">Local</span>
           </span>
         </Link>
 
@@ -120,7 +120,7 @@ export default function Navbar() {
               key={link.to + (link.state?.activeTab || "")}
               to={link.to}
               state={link.state}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${
                 isActive(link.to) &&
                 (!link.state ||
                   location.state?.activeTab === link.state?.activeTab)
@@ -134,9 +134,9 @@ export default function Navbar() {
           {isAuthenticated && (
             <Link
               to={dashboardLink}
-              className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-              <Home className="w-4 h-4" /> Dashboard
+              <Home className="w-4 h-4 font-bold" /> Dashboard
             </Link>
           )}
         </div>
@@ -150,9 +150,9 @@ export default function Navbar() {
             className="p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             {isDark ? (
-              <Sun className="w-5 h-5" />
+              <Sun className="w-5.1 h-5.1" />
             ) : (
-              <Moon className="w-5 h-5" />
+              <Moon className="w-5.1 h-5.1" />
             )}
           </button>
 
@@ -225,10 +225,10 @@ export default function Navbar() {
                           : `http://localhost:3000${user.avatar}`
                       }
                       alt={user.name}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-primary/30"
+                      className="w-9 h-9 rounded-full object-cover border-2 border-primary/30"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center">
                       {getInitials(user?.name)}
                     </div>
                   )}
@@ -331,7 +331,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 px-4 py-4 space-y-2 animate-slide-up">
+        <div className="md:hidden bg-white/25 dark:bg-slate-900/25 border-t border-slate-200 dark:border-slate-700 px-4 py-4 space-y-2 animate-slide-up">
           {navLinks.map((link) => (
             <Link
               key={link.to + (link.state?.activeTab || "")}
@@ -403,7 +403,7 @@ export default function Navbar() {
             <div className="flex gap-2 pt-2">
               <Link
                 to="/login"
-                className="flex-1 text-center py-2.5 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200"
+                className="flex-1 text-center py-2.5 border border-slate-600 dark:border-slate-300 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200"
               >
                 Login
               </Link>
