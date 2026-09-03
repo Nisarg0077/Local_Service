@@ -75,3 +75,45 @@ export const debounce = (fn, delay) => {
 };
 
 export const classNames = (...classes) => classes.filter(Boolean).join(' ');
+
+// Image & Avatar URL Helpers
+export const DEFAULT_AVATAR = '/default-avatar.png';
+
+export const getBackendBaseUrl = () => {
+  if (process.env.REACT_APP_IMAGE_BACKEND_URL) {
+    return process.env.REACT_APP_IMAGE_BACKEND_URL.replace(/\/+$/, '');
+  }
+  if (process.env.REACT_APP_BACKEND_URL) {
+    return process.env.REACT_APP_BACKEND_URL.replace(/\/api\/?$/, '').replace(/\/+$/, '');
+  }
+  if (process.env.IMAGE_BACKEND_URL) {
+    return process.env.IMAGE_BACKEND_URL.replace(/\/+$/, '');
+  }
+  return 'http://localhost:3000';
+};
+
+export const getImageUrl = (path, fallback = '') => {
+  if (!path || typeof path !== 'string') return fallback;
+  const trimmed = path.trim();
+  if (!trimmed) return fallback;
+
+  // If already absolute URL or data/blob URI, return as-is
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('blob:')
+  ) {
+    return trimmed;
+  }
+
+  const baseUrl = getBackendBaseUrl();
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  return `${baseUrl}${cleanPath}`;
+};
+
+export const getAvatarUrl = (avatarOrUser, fallback = DEFAULT_AVATAR) => {
+  if (!avatarOrUser) return fallback;
+  const avatarPath = typeof avatarOrUser === 'object' ? avatarOrUser.avatar : avatarOrUser;
+  return getImageUrl(avatarPath, fallback);
+};

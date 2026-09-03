@@ -50,7 +50,8 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: (data) => api.post("/auth/login", data),
-  register: (data) => api.post("/auth/register", data),
+  // register: (data) => api.post("/auth/register", data),
+  register: (data) => api.post("/userroutes/register", data),
   logout: () => api.post("/auth/logout"),
   profile: () => api.get("/auth/profile"),
 };
@@ -122,5 +123,9 @@ export const categoriesAPI = {
   update: (id, data) => api.put(`/categories/${id}`, data),
   delete: (id) => api.delete(`/categories/${id}`),
 };
+
+export const userAvetarAPI = {
+  getAvetar: () => api.get('uploads')
+}
 
 export default api;

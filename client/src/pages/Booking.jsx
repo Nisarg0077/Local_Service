@@ -6,7 +6,7 @@ import { CheckCircle, MapPin, Calendar, Clock, CreditCard, ChevronRight, Shield 
 import Button from '../components/common/Button';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
-import { formatCurrency, formatDate } from '../utils';
+import { formatCurrency, formatDate, getImageUrl } from '../utils';
 import { TIME_SLOTS } from '../constants';
 import toast from 'react-hot-toast';
 import { bookingsAPI } from '../services/api';
@@ -146,10 +146,17 @@ export default function Booking() {
               {/* Service Summary */}
               <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-2xl mb-6">
                 {service.image ? (
-                  <img src={service.image.startsWith('http') ? service.image : `http://localhost:3000${service.image}`} alt={service.title} className="w-16 h-16 rounded-xl object-cover shrink-0" />
-                ) : (
-                  <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center text-2xl shrink-0">🏠</div>
-                )}
+                  <img
+                    src={getImageUrl(service.image)}
+                    alt={service.title}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                    }}
+                    className="w-16 h-16 rounded-xl object-cover shrink-0"
+                  />
+                ) : null}
+                <div className={`w-16 h-16 rounded-xl bg-primary/10 ${service.image ? 'hidden' : 'flex'} items-center justify-center text-2xl shrink-0`}>🏠</div>
                 <div>
                   <p className="font-bold text-slate-800 dark:text-white">{service.title}</p>
                   {/* <p className="text-sm text-slate-500 dark:text-slate-400">by {provider.name}</p> */}

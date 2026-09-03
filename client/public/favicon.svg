@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <defs>
+    <linearGradient id="smartlocal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <!-- Background rounded squircle -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#smartlocal-grad)"/>
+  <!-- Subtle border highlight -->
+  <rect x="3" y="3" width="58" height="58" rx="15" fill="none" stroke="rgba(255, 255, 255, 0.25)" stroke-width="1.5"/>
+  <!-- White Lightning Zap Icon -->
+  <path d="M35 12 L21 34 L31 34 L27 52 L43 28 L33 28 Z" fill="#ffffff" filter="url(#shadow)"/>
+</svg>

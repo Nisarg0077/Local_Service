@@ -44,12 +44,12 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2 mb-4">
+            <Link to="/" className="flex items-center gap-2 mb-4" aria-label="SmartLocal Home">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-indigo-600 rounded-lg flex items-center justify-center">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-heading font-bold text-white">
-                Smart<span className="text-primary">Local</span>
+                Smart<span className="text-indigo-400">Local</span>
               </span>
             </Link>
             <p className="text-slate-400 text-sm leading-relaxed mb-6 max-w-xs">
@@ -57,21 +57,31 @@ export default function Footer() {
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-slate-400">
-                <Mail className="w-4 h-4 text-primary shrink-0" />
+                <Mail className="w-4 h-4 text-indigo-400 shrink-0" />
                 <span>support@smartlocal.in</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-400">
-                <Phone className="w-4 h-4 text-primary shrink-0" />
+                <Phone className="w-4 h-4 text-indigo-400 shrink-0" />
                 <span>+91 9876 543 210</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-400">
-                <MapPin className="w-4 h-4 text-primary shrink-0" />
+                <MapPin className="w-4 h-4 text-indigo-400 shrink-0" />
                 <span>New Delhi, India</span>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              {[FacebookIcon, TwitterIcon, InstagramIcon, YoutubeIcon].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 bg-slate-800 hover:bg-primary rounded-lg flex items-center justify-center transition-colors duration-200">
+              {[
+                { Icon: FacebookIcon, name: 'Facebook' },
+                { Icon: TwitterIcon, name: 'Twitter' },
+                { Icon: InstagramIcon, name: 'Instagram' },
+                { Icon: YoutubeIcon, name: 'YouTube' }
+              ].map(({ Icon, name }, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  aria-label={`Follow us on ${name}`}
+                  className="w-9 h-9 bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg flex items-center justify-center transition-colors duration-200"
+                >
                   <Icon />
                 </a>
               ))}
@@ -80,11 +90,11 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-white font-heading font-bold mb-4">Services</h4>
+            <h3 className="text-white font-heading font-bold mb-4">Services</h3>
             <ul className="space-y-2">
               {serviceLinks.map(s => (
                 <li key={s}>
-                  <Link to={`/services?category=${s}`} className="text-sm text-slate-400 hover:text-primary transition-colors">
+                  <Link to={`/services?category=${s}`} className="text-sm text-slate-400 hover:text-indigo-400 transition-colors">
                     {s}
                   </Link>
                 </li>
@@ -94,11 +104,11 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="text-white font-heading font-bold mb-4">Company</h4>
+            <h3 className="text-white font-heading font-bold mb-4">Company</h3>
             <ul className="space-y-2">
               {companyLinks.map(l => (
                 <li key={l.label}>
-                  <Link to={l.to} className="text-sm text-slate-400 hover:text-primary transition-colors">
+                  <Link to={l.to} className="text-sm text-slate-400 hover:text-indigo-400 transition-colors">
                     {l.label}
                   </Link>
                 </li>
@@ -108,11 +118,11 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h4 className="text-white font-heading font-bold mb-4">Support</h4>
+            <h3 className="text-white font-heading font-bold mb-4">Support</h3>
             <ul className="space-y-2">
               {supportLinks.map(l => (
                 <li key={l.label}>
-                  <Link to={l.to} className="text-sm text-slate-400 hover:text-primary transition-colors">
+                  <Link to={l.to} className="text-sm text-slate-400 hover:text-indigo-400 transition-colors">
                     {l.label}
                   </Link>
                 </li>
@@ -122,13 +132,13 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-slate-500">© {new Date().getFullYear()} SmartLocal. All rights reserved.</p>
+          <p className="text-xs text-slate-400">© {new Date().getFullYear()} SmartLocal. All rights reserved.</p>
           <div className="flex gap-4">
             <span className="text-xs text-slate-400 flex items-center gap-1">
               <span className="w-2 h-2 bg-success rounded-full animate-pulse"></span>
               All systems operational
             </span>
-            <span className="text-xs text-slate-500">v2.0.0</span>
+            <span className="text-xs text-slate-400">v2.0.0</span>
           </div>
         </div>
       </div>

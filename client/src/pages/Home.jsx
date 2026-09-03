@@ -18,7 +18,7 @@ import {
   testimonials,
 } from "../data/mockData";
 import { SERVICE_CATEGORIES } from "../constants";
-import { formatCurrency } from "../utils";
+import { formatCurrency, DEFAULT_AVATAR } from "../utils";
 import { servicesAPI, providerAPI } from "../services/api";
 
 const statItems = [
@@ -216,7 +216,7 @@ export default function Home() {
             </div>
             <Link
               to="/services"
-              className="hidden md:flex items-center gap-1 text-primary font-semibold hover:underline text-sm"
+              className="hidden md:flex items-center gap-1 text-primary dark:text-indigo-400 font-semibold hover:underline text-sm"
             >
               View All <ChevronRight className="w-4 h-4" />
             </Link>
@@ -244,7 +244,7 @@ export default function Home() {
           <div className="text-center mt-8 md:hidden">
             <Link
               to="/services"
-              className="inline-flex items-center gap-2 text-primary font-semibold"
+              className="inline-flex items-center gap-2 text-primary dark:text-indigo-400 font-semibold"
             >
               View All Services <ChevronRight className="w-4 h-4" />
             </Link>
@@ -343,13 +343,17 @@ export default function Home() {
                   <img
                     src={t.avatar}
                     alt={t.name}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = DEFAULT_AVATAR;
+                    }}
                     className="w-10 h-10 rounded-full ring-2 ring-primary/20 object-cover"
                   />
                   <div>
                     <p className="text-sm font-bold text-slate-800 dark:text-white">
                       {t.name}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {t.service} · {t.city}
                     </p>
                   </div>
