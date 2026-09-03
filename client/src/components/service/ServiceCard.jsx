@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Star, MapPin, Clock, Heart, Zap, BadgeCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { formatCurrency } from '../../utils';
+import { formatCurrency, getImageUrl, getAvatarUrl, DEFAULT_AVATAR } from '../../utils';
 import toast from 'react-hot-toast';
 import { usersAPI } from '../../services/api';
 
@@ -13,7 +13,6 @@ export default function ServiceCard({ service, provider }) {
   const isFavorited = (user?.favorites || []).map(Number).includes(Number(service.id));
 
   const isRestricted = user?.role === "provider" || user?.role === "admin";
-  // console.log(provider);
 
   // const handleFavorite = (e) => {
   //   e.preventDefault();
@@ -78,7 +77,7 @@ export default function ServiceCard({ service, provider }) {
       <div className="relative h-48 overflow-hidden bg-slate-100 dark:bg-slate-700">
         {!imgError && service.image ? (
           <img
-            src={service.image.startsWith('http') ? service.image : `http://localhost:3000${service.image}`}
+            src={getImageUrl(service.image)}
             alt={service.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={() => setImgError(true)}
@@ -129,14 +128,15 @@ export default function ServiceCard({ service, provider }) {
         {provider && (
           <div className="flex items-center gap-2 mb-3">
             <img
-              src={provider?.avatar && provider.avatar.startsWith('http') ? provider.avatar : (provider?.avatar ? `http://localhost:3000${provider.avatar}` : "https://i.pravatar.cc/150?u=default")}
+              src={getAvatarUrl(provider?.avatar)}
               alt={provider?.name || "Provider"}
               onError={(e) => {
-                e.target.src = "https://i.pravatar.cc/150?u=default";
+                e.target.onerror = null;
+                e.target.src = DEFAULT_AVATAR;
               }}
               className="w-6 h-6 rounded-full object-cover border border-slate-200"
             />
-            <span className="text-xs text-slate-500 dark:text-slate-400 truncate">{provider.name}</span>
+            <span className="text-xs text-slate-600 dark:text-slate-300 truncate">{provider.name}</span>
             {provider.verifiedBadge && (
               <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />
             )}
@@ -144,10 +144,10 @@ export default function ServiceCard({ service, provider }) {
         )}
 
         {/* Meta row */}
-        <div className="flex items-center gap-3 mb-3 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-3 mb-3 text-xs text-slate-500 dark:text-slate-300">
           <div className="flex items-center gap-0.5">
             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-            <span className="font-semibold text-slate-700 dark:text-slate-300">{service.rating}</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-200">{service.rating}</span>
             <span>({service.reviewCount})</span>
           </div>
           <div className="flex items-center gap-1">
@@ -163,7 +163,7 @@ export default function ServiceCard({ service, provider }) {
         </div>
 
         {/* Description */}
-        <p className="text-xs text-black dark:text-white line-clamp-2 mb-4 flex-1">
+        <p className="text-xs text-slate-700 dark:text-slate-200 line-clamp-2 mb-4 flex-1">
           {service.description}
         </p>
 
@@ -172,7 +172,7 @@ export default function ServiceCard({ service, provider }) {
           <div>
             <div className="flex items-baseline gap-1">
               {service.priceType === 'starting' && (
-                <span className="text-[10px] text-slate-400">Starts at</span>
+                <span className="text-[10px] text-slate-600 dark:text-slate-300">Starts at</span>
               )}
               <span className="text-lg font-bold text-slate-800 dark:text-white">
                 {formatCurrency(service.price)}
@@ -185,6 +185,7 @@ export default function ServiceCard({ service, provider }) {
                 <Link
                   to={`/services/${service.id}`}
                   state={{ service, provider }}
+                  aria-label={`View details for ${service.title}`}
                   className="px-3 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-gray-600 dark:border-slate-200 text-[10px] font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-all active:scale-95 whitespace-nowrap"
                 >
                   View Details
@@ -193,6 +194,7 @@ export default function ServiceCard({ service, provider }) {
                 <Link
                   to={`/services/${service.id}`}
                   state={{ service, provider, autoBook: true }}
+                  aria-label={`Book ${service.title} now`}
                   className="px-4 py-2 bg-primary/75 text-white text-xs font-bold rounded-xl hover:bg-indigo-700/75 transition-all hover:shadow-glow active:scale-100"
                 >
                   Book Now

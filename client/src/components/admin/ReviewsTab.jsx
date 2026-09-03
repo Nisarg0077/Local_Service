@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Trash2, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { usersAPI } from '../../services/api';
+import { getAvatarUrl, DEFAULT_AVATAR } from '../../utils';
 
 export default function ReviewsTab({ reviews, onDelete }) {
   const navigate = useNavigate();
@@ -29,11 +30,7 @@ export default function ReviewsTab({ reviews, onDelete }) {
               if (user.uid === id && user.role === "customer") {
                 map[id] = {
                   name: user.name,
-                  avatar: user.avatar
-                    ? user.avatar.startsWith("http")
-                      ? user.avatar
-                      : `http://localhost:3000${user.avatar}`
-                    : "/default-avatar.png",
+                  avatar: getAvatarUrl(user.avatar),
                 };
               }
 
@@ -41,7 +38,7 @@ export default function ReviewsTab({ reviews, onDelete }) {
               // fallback
               map[id] = {
                 name: "Guest User",
-                avatar: "/default-avatar.png",
+                avatar: DEFAULT_AVATAR,
               };
             }
           })
@@ -102,7 +99,19 @@ export default function ReviewsTab({ reviews, onDelete }) {
                     <td className="px-4 md:px-6 py-3 md:py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-500 font-bold overflow-hidden shrink-0">
-                          {userData?.avatar ? <img src={userData?.avatar} className='w-full h-full object-cover' alt={userData?.name} /> : 'U'}
+                          {userData?.avatar ? (
+                            <img
+                              src={getAvatarUrl(userData?.avatar)}
+                              className='w-full h-full object-cover'
+                              alt={userData?.name}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = DEFAULT_AVATAR;
+                              }}
+                            />
+                          ) : (
+                            'U'
+                          )}
                         </div>
                         <span className="font-bold text-slate-800 dark:text-white truncate">{userData?.name || 'Guest'}</span>
                       </div>

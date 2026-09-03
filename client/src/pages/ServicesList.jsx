@@ -15,7 +15,7 @@ import { SkeletonCard } from "../components/common/SkeletonCard";
 // import { mockServices, mockProviders, categories } from '../data/mockData';
 import { SORT_OPTIONS, PRICE_RANGES } from "../constants";
 import { useDebounce } from "../hooks/useDebounce";
-import { servicesAPI, providerAPI } from "../services/api";
+import { servicesAPI, providerAPI, categoriesAPI } from "../services/api";
 import axios from "axios";
 
 const DELAY_MS = 600;
@@ -71,9 +71,7 @@ export default function ServicesList() {
     setTimeout(async () => {
       try {
         const res = await servicesAPI.getAll();
-        const categories = await axios.get(
-          "http://localhost:3000/api/categories/",
-        );
+        const categories = await categoriesAPI.getAll();
         // console.log(categories.data)
         setCategories(categories.data);
 

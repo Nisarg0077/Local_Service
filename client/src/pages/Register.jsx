@@ -6,6 +6,7 @@ import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { authAPI, usersAPI } from '../services/api';
 
 const ROLES = [
   { value: 'customer', label: 'Customer', desc: 'Book services', icon: '🛒' },
@@ -49,14 +50,16 @@ export default function Register() {
   const generateUID = async (role) => {
     try {
 
-      const res = await fetch("http://localhost:3000/api/userroutes/users");
-      const users = await res.json();
+      const res = await usersAPI.getAll();
+      const users = res.data;
+
 
       let prefix = "c";
       if (role === "provider") prefix = "p";
       if (role === "admin") prefix = "a";
 
       const roleUsers = users.filter(u => u.role === role);
+  
 
       let maxNumber = 0;
 
@@ -103,6 +106,7 @@ export default function Register() {
 
       const uid = await generateUID(form.role);
 
+
       const userData = {
         ...form,
         uid
@@ -117,12 +121,8 @@ export default function Register() {
         }
       });
 
-      const res = await fetch("http://localhost:3000/api/userroutes/register", {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await res.json();
+      const res = await authAPI.register(formData);
+      const data = res.data;
 
       if (!data.reg) {
         toast.error(data.message || "Registration failed");

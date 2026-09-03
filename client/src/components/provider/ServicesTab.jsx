@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2, Edit, Plus, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getImageUrl } from '../../utils';
 
 export default function ServicesTab({ services, onDelete }) {
   const navigate = useNavigate();
@@ -53,10 +54,17 @@ export default function ServicesTab({ services, onDelete }) {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {s.image ? (
-                        <img src={s.image.startsWith('http') ? s.image : `http://localhost:3000${s.image}`} alt={s.title} className="w-10 h-10 rounded-lg object-cover bg-slate-100" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-600 flex items-center justify-center">?</div>
-                      )}
+                        <img
+                          src={getImageUrl(s.image)}
+                          alt={s.title}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                          }}
+                          className="w-10 h-10 rounded-lg object-cover bg-slate-100"
+                        />
+                      ) : null}
+                      <div className={`w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-600 ${s.image ? 'hidden' : 'flex'} items-center justify-center`}>?</div>
                       <div>
                         <p className="font-medium text-slate-800 dark:text-white">{s.title}</p>
                         {s.popular && <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-bold">Popular</span>}

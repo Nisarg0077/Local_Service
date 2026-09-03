@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle } from "lucide-react";
 import api from "../services/api";
 import toast from "react-hot-toast";
 import { usersAPI } from "../services/api";
+import { getAvatarUrl, DEFAULT_AVATAR } from "../utils";
 
 export default function ApproveReviews() {
   const navigate = useNavigate();
@@ -36,18 +37,14 @@ export default function ApproveReviews() {
               if (user.uid === id && user.role === "customer") {
                 map[id] = {
                   name: user.name,
-                  avatar: user.avatar
-                    ? user.avatar.startsWith("http")
-                      ? user.avatar
-                      : `http://localhost:3000${user.avatar}`
-                    : "/default-avatar.png",
+                  avatar: getAvatarUrl(user.avatar),
                 };
               }
             } catch (err) {
               // fallback
               map[id] = {
                 name: "Guest User",
-                avatar: "/default-avatar.png",
+                avatar: DEFAULT_AVATAR,
               };
             }
           }),
@@ -143,9 +140,13 @@ export default function ApproveReviews() {
                               <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-500 font-bold overflow-hidden">
                                 {userData?.avatar ? (
                                   <img
-                                    src={userData?.avatar}
-                                    className="w-full h-full object-fill"
+                                    src={getAvatarUrl(userData?.avatar)}
+                                    className="w-full h-full object-cover"
                                     alt={userData?.name}
+                                    onError={(e) => {
+                                      e.target.onerror = null;
+                                      e.target.src = DEFAULT_AVATAR;
+                                    }}
                                   />
                                 ) : (
                                   "U"

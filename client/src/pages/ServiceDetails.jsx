@@ -16,7 +16,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import Button from "../components/common/Button";
 import Badge from "../components/common/Badge";
-import { formatCurrency, formatDate, getInitials } from "../utils";
+import { formatCurrency, formatDate, getInitials, getImageUrl, getAvatarUrl, DEFAULT_AVATAR } from "../utils";
 import toast from "react-hot-toast";
 import { reviewsAPI, usersAPI, bookingsAPI } from "../services/api";
 import { useEffect } from "react";
@@ -84,7 +84,7 @@ export default function ServiceDetails() {
             if (!id || typeof id !== "string") {
               map[id] = {
                 name: "Anonymous",
-                avatar: "/default-avatar.png",
+                avatar: DEFAULT_AVATAR,
               };
               return;
             }
@@ -94,11 +94,7 @@ export default function ServiceDetails() {
 
               map[id] = {
                 name: res.data.name || "Anonymous",
-                avatar: res.data.avatar
-                  ? res.data.avatar.startsWith("http")
-                    ? res.data.avatar
-                    : `http://localhost:3000${res.data.avatar}`
-                  : "/default-avatar.png",
+                avatar: getAvatarUrl(res.data.avatar),
               };
             } catch (err) {
               // ✅ Ignore 404 silently
@@ -108,7 +104,7 @@ export default function ServiceDetails() {
 
               map[id] = {
                 name: "Anonymous",
-                avatar: "/default-avatar.png",
+                avatar: DEFAULT_AVATAR,
               };
             }
           }),
@@ -256,19 +252,20 @@ export default function ServiceDetails() {
             <div className="relative rounded-3xl overflow-hidden h-64 sm:h-80 bg-slate-100 dark:bg-slate-800">
               {service.image ? (
                 <img
-                  src={
-                    service.image.startsWith("http")
-                      ? service.image
-                      : `http://localhost:3000${service.image}`
-                  }
+                  src={getImageUrl(service.image)}
                   alt={service.title}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                  }}
                   className="w-full h-full object-cover"
                 />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-7xl">
-                  🏠
-                </div>
-              )}
+              ) : null}
+              <div
+                className={`w-full h-full ${service.image ? 'hidden' : 'flex'} items-center justify-center text-7xl`}
+              >
+                🏠
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
               <div className="absolute top-4 left-4">
                 <Badge status="Active" label={service.category} />
@@ -420,14 +417,12 @@ export default function ServiceDetails() {
                           className="flex gap-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-xl"
                         >
                           <img
-                            src={
-                              usersMap[r.userId]?.avatar?.startsWith("http")
-                                ? usersMap[r.userId].avatar
-                                : usersMap[r.userId]?.avatar
-                                  ? `http://localhost:3000${usersMap[r.userId].avatar}`
-                                  : "/default-avatar.png"
-                            }
+                            src={getAvatarUrl(usersMap[r.userId]?.avatar)}
                             alt={usersMap[r.userId]?.name || "Anonymous"}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = DEFAULT_AVATAR;
+                            }}
                             className="w-10 h-10 rounded-full shrink-0 object-cover"
                           />
                           <div className="flex-1">
@@ -581,7 +576,7 @@ export default function ServiceDetails() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="relative">
                     <img
-                      src={provider.avatar.startsWith('http') ? provider.avatar : `http://localhost:3000${provider.avatar}`}
+                      src={getAvatarUrl(provider.avatar)}
                       alt={provider.name}
                       className="w-14 h-14 rounded-2xl object-cover ring-2 ring-primary/20"
                     />
@@ -639,8 +634,12 @@ export default function ServiceDetails() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="relative">
                     <img
-                      src={`http://localhost:3000` + provider.avatar}
+                      src={getAvatarUrl(provider.avatar)}
                       alt={provider.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = DEFAULT_AVATAR;
+                      }}
                       className="w-14 h-14 rounded-2xl object-cover ring-2 ring-primary/20"
                     />
                     {provider.isAvailable && (

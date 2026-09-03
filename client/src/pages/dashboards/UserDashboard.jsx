@@ -22,9 +22,9 @@ import {
   servicesAPI,
   providerAPI,
   usersAPI,
+  reviewsAPI
 } from "../../services/api";
-import { formatCurrency, formatDate, getInitials } from "../../utils";
-import { reviewsAPI } from "../../services/api";
+import { formatCurrency, formatDate, getInitials, getImageUrl, getAvatarUrl, DEFAULT_AVATAR } from "../../utils";
 import toast from "react-hot-toast";
 import { useLocation } from "react-router-dom";
 import ProfileTab from "../../components/common/ProfileTab";
@@ -54,11 +54,10 @@ function StarPicker({ value, onChange }) {
           className="focus:outline-none transition-transform hover:scale-110"
         >
           <Star
-            className={`w-8 h-8 transition-colors ${
-              n <= (hovered || value)
-                ? "fill-amber-400 text-amber-400"
-                : "text-slate-300 dark:text-slate-600"
-            }`}
+            className={`w-8 h-8 transition-colors ${n <= (hovered || value)
+              ? "fill-amber-400 text-amber-400"
+              : "text-slate-300 dark:text-slate-600"
+              }`}
           />
         </button>
       ))}
@@ -219,8 +218,15 @@ export default function UserDashboard() {
   const [reviewModal, setReviewModal] = useState(null); // { booking, service }
   const [submittedServiceIds, setSubmittedServiceIds] = useState(new Set());
 
-  const [userBookings, setUserBookings] = useState([]);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [avatarError, setAvatarError] = useState(false);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user?.avatar]);
   const [bookingsLoading, setBookingsLoading] = useState(true);
+
+  const [userBookings, setUserBookings] = useState([]);
 
   const userId = user?.uid;
   const filteredBookings =
@@ -433,14 +439,11 @@ export default function UserDashboard() {
           {/* User Info */}
           <div className="p-6 border-b border-slate-100 dark:border-slate-700">
             <div className="flex items-center gap-3">
-              {user?.avatar ? (
+              {user?.avatar && !avatarError ? (
                 <img
-                  src={
-                    user.avatar.startsWith("http")
-                      ? user.avatar
-                      : `http://localhost:3000${user.avatar}`
-                  }
+                  src={getAvatarUrl(user.avatar)}
                   alt={user.name}
+                  onError={() => setAvatarError(true)}
                   className="w-12 h-12 rounded-2xl object-cover ring-2 ring-primary/20"
                 />
               ) : (
@@ -1041,19 +1044,18 @@ export default function UserDashboard() {
                       >
                         {s.image ? (
                           <img
-                            src={
-                              s.image.startsWith("http")
-                                ? s.image
-                                : `http://localhost:3000${s.image}`
-                            }
+                            src={getImageUrl(s.image)}
                             alt={s.title}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                            }}
                             className="w-16 h-16 rounded-xl object-cover shrink-0"
                           />
-                        ) : (
-                          <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center text-2xl shrink-0">
-                            🏠
-                          </div>
-                        )}
+                        ) : null}
+                        <div className={`w-16 h-16 rounded-xl bg-primary/10 ${s.image ? 'hidden' : 'flex'} items-center justify-center text-2xl shrink-0`}>
+                          🏠
+                        </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-slate-800 dark:text-white text-sm mb-1 truncate">
                             {s.title}

@@ -12,9 +12,8 @@ import {
   User,
 } from "lucide-react";
 import api, { usersAPI } from "../../services/api";
-import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
-import { getInitials } from "../../utils";
+import { getInitials, getAvatarUrl } from "../../utils";
 
 // Subcomponents
 import OverviewTab from "../../components/provider/OverviewTab";
@@ -24,6 +23,7 @@ import ReviewsTab from "../../components/provider/ReviewsTab";
 import ProfileTab from "../../components/common/ProfileTab";
 
 import { providerEarningsData } from "../../data/mockData";
+import toast from "react-hot-toast";
 
 const NAV_ITEMS = [
   { id: "overview", label: "Overview", icon: Home },
@@ -37,6 +37,11 @@ export default function ProviderDashboard() {
   const { activeTabfromURL } = useParams();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [avatarError, setAvatarError] = useState(false);
+
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user?.avatar]);
 
   const validTabs = NAV_ITEMS.map((item) => item.id);
   const [activeTab, setActiveTab] = useState(() => {
@@ -375,14 +380,11 @@ export default function ProviderDashboard() {
         <aside className="w-full md:w-64 shrink-0 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex flex-col pt-4">
           <div className="p-6 border-b border-slate-100 dark:border-slate-700">
             <div className="flex items-center gap-3 mb-4">
-              {user?.avatar ? (
+              {user?.avatar && !avatarError ? (
                 <img
-                  src={
-                    user.avatar.startsWith("http")
-                      ? user.avatar
-                      : `http://localhost:3000${user.avatar}`
-                  }
+                  src={getAvatarUrl(user.avatar)}
                   alt=""
+                  onError={() => setAvatarError(true)}
                   className="w-12 h-12 rounded-2xl ring-2 ring-primary/40 object-cover"
                 />
               ) : (
@@ -448,11 +450,10 @@ export default function ProviderDashboard() {
                 <button
                   key={item.id}
                   onClick={() => handleTabChange(item.id)}
-                  className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    activeTab === item.id
+                  className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === item.id
                       ? "bg-indigo-600 text-white"
                       : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-800 dark:hover:text-white"
-                  }`}
+                    }`}
                 >
                   <Icon className="w-5 h-5" />
                   {item.label}

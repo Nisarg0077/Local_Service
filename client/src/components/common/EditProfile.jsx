@@ -4,6 +4,7 @@ import { usersAPI, providerAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 import { Save, User, Mail, Phone, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getAvatarUrl, DEFAULT_AVATAR } from '../../utils';
 
 
 export default function EditProfile() {
@@ -205,17 +206,34 @@ export default function EditProfile() {
           </div>
 
           {/* Avatar Field */}
-          <div>
+          <div className="flex flex-col">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
               Profile Avatar
             </label>
-            <input
-              type="file"
-              name="avatar"
-              accept="image/*"
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-700 shrink-0">
+                <img
+                  src={
+                    formData.avatar instanceof File
+                      ? URL.createObjectURL(formData.avatar)
+                      : getAvatarUrl(formData.avatar)
+                  }
+                  alt="Avatar Preview"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = DEFAULT_AVATAR;
+                  }}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <input
+                type="file"
+                name="avatar"
+                accept="image/*"
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-white file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
           </div>
 
           {/* Address Field */}

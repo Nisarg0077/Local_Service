@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Clock, Tag, ArrowRight, Search, Zap } from 'lucide-react';
+import { DEFAULT_AVATAR } from '../utils';
 
 const posts = [
   {
@@ -107,7 +108,15 @@ export default function Blog() {
                 <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">{featured.excerpt}</p>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <img src={featured.authorAvatar} alt={featured.author} className="w-8 h-8 rounded-full" />
+                    <img
+                      src={featured.authorAvatar}
+                      alt={featured.author}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = DEFAULT_AVATAR;
+                      }}
+                      className="w-8 h-8 rounded-full"
+                    />
                     <span className="text-sm text-slate-600 dark:text-slate-400">{featured.author} · {featured.date}</span>
                   </div>
                   <button className="flex items-center gap-1 text-orange-600 font-bold text-sm hover:underline">
@@ -151,7 +160,15 @@ export default function Blog() {
                   <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 leading-relaxed line-clamp-2">{post.excerpt}</p>
                   <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
                     <div className="flex items-center gap-2">
-                      <img src={post.authorAvatar} alt={post.author} className="w-6 h-6 rounded-full" />
+                      <img
+                        src={post.authorAvatar}
+                        alt={post.author}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = DEFAULT_AVATAR;
+                        }}
+                        className="w-6 h-6 rounded-full"
+                      />
                       <span className="text-xs text-slate-500">{post.author} · {post.date}</span>
                     </div>
                     <button className="text-orange-500 hover:text-orange-600 font-semibold text-xs flex items-center gap-1">

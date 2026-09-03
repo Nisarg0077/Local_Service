@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Target, Award, Heart, Zap, Globe, ArrowRight, CheckCircle } from 'lucide-react';
+import { DEFAULT_AVATAR } from '../utils';
 
 const stats = [
   { label: 'Happy Customers', value: '15,000+', icon: '😊' },
@@ -120,7 +121,15 @@ export default function About() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((m) => (
               <div key={m.name} className="text-center">
-                <img src={m.avatar} alt={m.name} className="w-20 h-20 rounded-2xl mx-auto mb-4 object-cover shadow-md" />
+                <img
+                  src={m.avatar}
+                  alt={m.name}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = DEFAULT_AVATAR;
+                  }}
+                  className="w-20 h-20 rounded-2xl mx-auto mb-4 object-cover shadow-md"
+                />
                 <h3 className="font-bold text-slate-800 dark:text-white">{m.name}</h3>
                 <div className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mb-2">{m.role}</div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{m.bio}</p>

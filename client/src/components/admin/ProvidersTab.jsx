@@ -1,6 +1,7 @@
 import React from "react";
 import { Trash2, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import { getAvatarUrl, DEFAULT_AVATAR } from "../../utils";
 
 export default function ProvidersTab({ providers, onDelete }) {
   const handleDelete = (id) => {
@@ -56,12 +57,12 @@ export default function ProvidersTab({ providers, onDelete }) {
                       <div className="flex items-center gap-3">
                         {p.avatar ? (
                           <img
-                            src={
-                              p.avatar.startsWith("http")
-                                ? p.avatar
-                                : `http://localhost:3000${p.avatar}`
-                            }
+                            src={getAvatarUrl(p.avatar)}
                             alt="Avatar"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = DEFAULT_AVATAR;
+                            }}
                             className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover shrink-0"
                           />
                         ) : (
