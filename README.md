@@ -1,7 +1,9 @@
 # Smart Local Service Marketplace
 
 A robust and modern MERN (MongoDB, Express, React, Node.js) stack application designed to connect customers with local service professionals. The platform provides a seamless experience for booking, managing, and reviewing services like plumbing, electrical work, cleaning, and more.
-
+---
+### 🔗LIVE DEMO: https://local-service-eta.vercel.app/
+---
 ## 🚀 Key Features
 
 ### 👥 Role-Based Dashboards
