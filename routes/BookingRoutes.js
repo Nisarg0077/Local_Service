@@ -88,7 +88,8 @@ router.post("/", async (req, res) => {
                         <p>Best regards,<br><strong>Smart Local Service Team</strong></p>
                     </div>
                 `;
-        await sendEmail(customer.email, subject, htmlContent);
+        // Run email sending asynchronously so it doesn't block the API response
+        sendEmail(customer.email, subject, htmlContent).catch(e => console.error(e));
       }
     } catch (emailError) {
       console.error("Email notification failed:", emailError);
@@ -169,7 +170,8 @@ router.put("/:id", async (req, res) => {
                             <p>Best regards,<br><strong>Smart Local Service Team</strong></p>
                         </div>
                     `;
-          await sendEmail(customer.email, subject, htmlContent);
+          // Run email sending asynchronously so it doesn't block the API response
+          sendEmail(customer.email, subject, htmlContent).catch(e => console.error(e));
         }
       } catch (emailError) {
         console.error("Status update email failed:", emailError);
