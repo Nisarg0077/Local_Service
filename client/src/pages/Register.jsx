@@ -53,13 +53,12 @@ export default function Register() {
       const res = await usersAPI.getAll();
       const users = res.data;
 
-
       let prefix = "c";
       if (role === "provider") prefix = "p";
       if (role === "admin") prefix = "a";
 
       const roleUsers = users.filter(u => u.role === role);
-  
+
 
       let maxNumber = 0;
 
@@ -132,12 +131,12 @@ export default function Register() {
       // Automatically log in after registration
       // We need to fetch the user again or get it from the registration response if it returned the user/token
       // For now, let's just use the current mock login approach or navigate to login
-      
+
       // Since our register context function also sets the user, we should probably call it 
       // with the response data if it contains the user/token.
       // But the backend /register only returns { message, reg: true }.
       // So we should probably navigate to login or update register context to be better.
-      
+
       toast.success(`Account created! Please log in to continue. 🎉`);
       navigate("/login");
 

@@ -53,7 +53,7 @@ export function AuthProvider({ children }) {
         clearCookie("slms_session");
         try {
           await api.post("/userroutes/logout", { uid: browserCookie.uid });
-        } catch (e) {}
+        } catch (e) { }
         setLoading(false);
         return;
       }
